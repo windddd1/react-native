@@ -8,6 +8,6 @@ import UserSagas from './_user-sagas'
 
 export default function* root() {
     yield all([
-        takeLatest(UserTypes.GET_USER_REQUEST, UserSagas.getAllUser), //run side effects
+        takeLatest(UserTypes.GET_USER_REQUEST, UserSagas.getAllUser), //TODO:run side effects
     ])
 }

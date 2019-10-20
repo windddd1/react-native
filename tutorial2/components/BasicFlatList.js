@@ -9,9 +9,9 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = state => {
     return {
-      processing: state.user.processing,
-      data: state.user.data.userList,
-      error: state.user.error
+        processing: state.user.processing,
+        data: state.user.data.userList,
+        error: state.user.error
     }
 }  
 
@@ -19,7 +19,7 @@ class FlatListItem extends Component {
     render() {
         return (
             <View style={{flex:1, backgroundColor:this.props.index % 2 == 0 ? 'mediumseagreen' : 'tomato'}}>
-                <Text style={styles.flatListItem}>{this.props.item.userId}</Text>
+                <Text style={styles.flatListItem}>{this.props.item.id.toString()}</Text>
                 <Text >{this.props.item.body}</Text>
             </View>
         )
@@ -44,6 +44,7 @@ export class BasicFlatList extends React.Component {
             <View style= {{flex: 1, marginTop: 22}}>
                 <FlatList
                     data={Object.values(this.props.data)}
+                    keyExtractor={(item, index) => index.toString()}    //TODO:Chosse key for a item
                     renderItem={({item,index}) => {
                         return (
                             <FlatListItem item={item} index={index}></FlatListItem>

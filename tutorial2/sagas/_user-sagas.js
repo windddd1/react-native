@@ -5,7 +5,9 @@ import axios from 'axios'
 const UserSagas = {
     *getAllUser() {
         try{
-            const userList = yield axios.get('http://jsonplaceholder.typicode.com/posts')
+            const userList = yield call(()=>{
+                return axios.get('http://jsonplaceholder.typicode.com/posts')
+            })
             yield put(UserActions.getUserSuccess(userList.data))
         } catch (err) {
             console.log(err)
