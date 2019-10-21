@@ -3,12 +3,16 @@ import { createReducer, createActions } from 'reduxsauce'
 // TODO:Declare Action and type
 const { Types, Creators } = createActions({
     getUserRequest: [],
-    getUserSuccess: ['users'],  // define params to getUserSuccess
-    getUserFailure : ['error']
+    getUserSuccess: ['users'],  // TODO:define params to getUserSuccess
+    getUserFailure : ['error'],
+    deleteUserRequest:['id'],
+    deleteUserSuccess:[],
+    editUserRequest: ['id'],
+    editUserSuccess: [],
 })
 
 export const UserTypes = Types
-export default Creators     // export action
+export default Creators
 
 //TODO: Declare initial state
 export const INITIAL_STATE = {
@@ -25,28 +29,25 @@ export const request = state => {
     return { ...state, processing: true} 
 }
 
-export const success = (state, {users}) => {
+export const getAllSuccess = (state, {users}) => {
     return { ...state, processing: false, data:{
         userList : users
     }}
 }
-// export const success = (state, action) => {
-//     const {users, type} = action
-//     console.log(action)
-//     console.log(type)
-//     console.log(users)
-//     return { ...state, processing: false, data:{
-//         userList : users
-//     }}
-// }
+
+export const deleteSuccess = (state) => {
+    return {...state, processing: false}
+}
 
 export const failure = (state, {error}) => {
-    return { ...state, processing: true, error:error}
+    return { ...state, processing: false, error:error}
 }
 
  //TODO:Hookup Reducers To Types in Action
 export const reducer = createReducer( INITIAL_STATE ,{
     [UserTypes.GET_USER_REQUEST]: request,
-    [UserTypes.GET_USER_SUCCESS]: success,
-    [UserTypes.GET_USER_FAILURE]: failure
+    [UserTypes.GET_USER_SUCCESS]: getAllSuccess,
+    [UserTypes.GET_USER_FAILURE]: failure,
+    [UserTypes.DELETE_USER_REQUEST]: request,
+    [UserTypes.DELETE_USER_SUCCESS]: deleteSuccess,
 })
