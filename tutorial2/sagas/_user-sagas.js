@@ -8,32 +8,45 @@ httpClient.defaults.timeout = 3000;
 const UserSagas = {
     *getAllUser() {
         try {
-            const userList = yield call(getUser)
+            const userList = yield call(apiGetUser)
             yield put(UserActions.getUserSuccess(userList.data))
         } catch (err) {
             console.log(err)
-            yield put(UserActions.getUserFailure(err))
+            yield put(UserActions.sideEffectFailure(err))
         }
     },
     *deleteUser() {
         try {
-            const response = yield call(deleteUser)
+            const response = yield call(apiDeleteUser)
             console.log(response)
             yield put(UserActions.deleteUserSuccess())
         } catch (err) {
             console.log(err)
-            yield put(UserActions.getUserFailure(err))
+            yield put(UserActions.sideEffectFailure(err))
+        }
+    },
+    *postUser(action) {
+        try {
+            const { user } = action
+            const response = yield call(apiPostUser,user)
+            console.log(response)
+            yield put(UserActions.postUserSuccess())
+        } catch (err) {
+            console.log(err)
+            yield put(UserActions.sideEffectFailure(err))
         }
     }
 }
 
-function getUser() {
+function apiGetUser() {
     return httpClient.get("https://jsonplaceholder.typicode.com/posts")
 }
 
-function deleteUser() {
-    httpClient.defaults.timeout = 3000;
+function apiDeleteUser() {
     return httpClient.delete("https://jsonplaceholder.typicode.com/posts/1")
 }
 
+function apiPostUser(user) {
+    return httpClient.post("https://jsonplaceholder.typicode.com/posts",user)
+}
 export default UserSagas

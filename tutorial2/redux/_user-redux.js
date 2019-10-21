@@ -4,11 +4,13 @@ import { createReducer, createActions } from 'reduxsauce'
 const { Types, Creators } = createActions({
     getUserRequest: [],
     getUserSuccess: ['users'],  // TODO:define params to getUserSuccess
-    getUserFailure : ['error'],
     deleteUserRequest:['id'],
     deleteUserSuccess:[],
+    postUserRequest:['user'],
+    postUserSuccess: [],
     editUserRequest: ['id'],
     editUserSuccess: [],
+    sideEffectFailure : ['error'],
 })
 
 export const UserTypes = Types
@@ -39,6 +41,10 @@ export const deleteSuccess = (state) => {
     return {...state, processing: false}
 }
 
+export const postSuccess = (state) => {
+    return {...state, processing: false}
+}
+
 export const failure = (state, {error}) => {
     return { ...state, processing: false, error:error}
 }
@@ -47,7 +53,10 @@ export const failure = (state, {error}) => {
 export const reducer = createReducer( INITIAL_STATE ,{
     [UserTypes.GET_USER_REQUEST]: request,
     [UserTypes.GET_USER_SUCCESS]: getAllSuccess,
-    [UserTypes.GET_USER_FAILURE]: failure,
     [UserTypes.DELETE_USER_REQUEST]: request,
     [UserTypes.DELETE_USER_SUCCESS]: deleteSuccess,
+    [UserTypes.POST_USER_REQUEST] : request,
+    [UserTypes.POST_USER_SUCCESS] : postSuccess,
+    [UserTypes.SIDE_EFFECT_FAILURE]: failure,
+
 })

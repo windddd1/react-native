@@ -25,7 +25,7 @@ export class BasicFlatList extends React.Component {
         this.state = ({
             userCollection: [],
             deleteKey: null,
-            openModal:true            
+            openModal:false            
         })   
     }
 
@@ -38,13 +38,18 @@ export class BasicFlatList extends React.Component {
             deleteKey: key
         })
     }
-    //TODO: press btn add
-    addItem = () => {
+    //TODO: press btn add to open modalbox
+    openModalBox = () => {
         this.setState({
             openModal : true
         })
     }
-
+    //TODO: Close modal and change flag
+    closeModalBox = () => {
+        this.setState({
+            openModal : false
+        })
+    }
     static getDerivedStateFromProps(nextProps, prevState) { //TODO: To interact to data from api return
         // do things with nextProps.someProp and prevState.cachedSomeProp
         if (nextProps.userCollection !== prevState.userCollection) {
@@ -73,7 +78,7 @@ export class BasicFlatList extends React.Component {
                             title="Add"
                             color="#40b883"
                             style={{ width: 100, height: 35, marginRight:20 }}
-                            onPress={() => this.addItem()}
+                            onPress={() => this.openModalBox()}
                         />
                 </View>
                 <FlatList

@@ -52,6 +52,15 @@ export class FlatListItem extends Component {
                     type: 'delete'
                 }
             ],
+            left: [
+                {
+                    onPress: () => {
+                        this.props.parentFlatList.openModalBox()
+                    },
+                    text: 'Edit',
+                    type:'primary'
+                }
+            ],
             rowId: this.props.index,
             sectionId:1
         }
@@ -59,7 +68,7 @@ export class FlatListItem extends Component {
             <Swipeout {...swipeoutSetting}>
                 <View style={{flex:1, backgroundColor:'#40b883' , marginBottom:2}}>
                     <Text style={styles.flatListItem}>{this.props.item.id.toString()}</Text>
-                    <Text >{this.props.item.body}</Text>
+                    <Text style={styles.flatListItem} >{this.props.item.body}</Text>
                 </View>
             </Swipeout>
         )
@@ -70,7 +79,7 @@ const styles = StyleSheet.create({
     flatListItem: {
         color: 'white',
         padding: 10,
-        fontSize: 16
+        fontSize: 13
     },
 })
 

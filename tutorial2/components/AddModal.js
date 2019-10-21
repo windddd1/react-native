@@ -8,7 +8,7 @@ import Button from 'react-native-button';
 
 
 const mapDispatchToProps = dispatch => ({
-
+    postUser : (user) => {dispatch(AuthsActions.postUserRequest(user))}
 })
 
 const screen = Dimensions.get('window')
@@ -16,14 +16,17 @@ const screen = Dimensions.get('window')
 const mapStateToProps = state => {
     return {
         processing: state.user.processing,
-        data: state.user.data.userList,
         error: state.user.error
     }
 }
 
 export class AddModal extends React.Component {
-    showAddModal = () => {
-        this.refs.myModal.open();
+    constructor(props) {
+        super(props)
+        this.state = ({
+            id: '',
+            body: ''           
+        })   
     }
     render() {
         return (
@@ -39,8 +42,7 @@ export class AddModal extends React.Component {
                 }}
                 position='center'
                 backdrop={true}
-                onClosed={() => {
-                }}
+                onClosed={() => {this.props.parentFlatList.closeModalBox()}}
             >
                 <Text style={{
                     fontSize: 16,
@@ -50,22 +52,38 @@ export class AddModal extends React.Component {
                 }}>Add User</Text>
                 <TextInput
                     style={styles.inputWrapper}
-                    onChangeText={(text) => this.setState({})}
+                    onChangeText={(text) => this.setState({ id: text })}
                     placeholder="Enter Id"
+                    value={this.state.id}
                 />
                 <TextInput
                     style={styles.inputWrapper}
-                    onChangeText={(text) => this.setState({})}
+                    onChangeText={(text) => this.setState({ body: text })}
                     placeholder="Enter Body"
+                    value={this.state.body}
                 />
-               <View style={{justifyContent: 'center',flexDirection: 'row'}}>
-               <Button
-                    style={{ fontSize: 20, color: 'white' }}
-                    containerStyle={{ padding: 10, height: 45,width:100, overflow: 'hidden', borderRadius: 4, backgroundColor: '#40b883' }}
-                    onPress={() => this._handlePress()}>
-                    Add
-                </Button>
-               </View>
+                <View style={{justifyContent: 'center',flexDirection: 'row'}}>
+                    <Button
+                        style={{ fontSize: 20, color: 'white' }}
+                        containerStyle={{ padding: 10, height: 45,width:100, overflow: 'hidden', borderRadius: 4, backgroundColor: '#40b883' }}
+                        onPress={() => {
+                            if (this.state.id.length == 0 || this.state.body.length == 0) {
+                                alert("You must enter id and body");
+                                return
+                            }
+                            const newUser = {
+                                id: this.state.id,
+                                body: this.state.body,
+                            }
+                            this.setState({ 
+                                id:'',
+                                body: '' 
+                            })
+                            this.props.postUser(newUser)
+                        }}>
+                        Add
+                    </Button>
+                </View>
             </Modal>
         )
     }
