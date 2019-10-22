@@ -3,12 +3,15 @@ import { FlatList, StyleSheet, View, Button } from 'react-native'
 import FlatListItem from './FlatListItem'
 import Spinner from 'react-native-loading-spinner-overlay'
 import AddModal from './AddModal'
-import AuthsActions from '../redux/_user-redux'
-import { connect } from 'react-redux';
+import UserActions from '../redux/_user-redux'
+import { connect } from 'react-redux'
+import ModalBoxActions from '../redux/_modalBox-redux'
+
 
 const mapDispatchToProps = dispatch => ({
-    getListUser: () => dispatch(AuthsActions.getUserRequest()),
-    deleteUser: (id) => dispatch(AuthsActions.deleteUserRequest(id))
+    getListUser: () => dispatch(UserActions.getUserRequest()),
+    deleteUser: (id) => dispatch(UserActions.deleteUserRequest(id)),
+    openModalAddUser: (info) => dispatch(ModalBoxActions.setInfoModalBox(info))
 })
 
 const mapStateToProps = state => {
@@ -24,8 +27,7 @@ export class BasicFlatList extends React.Component {
         super(props)
         this.state = ({
             userCollection: [],
-            deleteKey: null,
-            openModal:false            
+            deleteKey: null,     
         })   
     }
 
@@ -38,25 +40,15 @@ export class BasicFlatList extends React.Component {
             deleteKey: key
         })
     }
-    //TODO: press btn add to open modalbox
-    openModalBox = () => {
-        this.setState({
-            openModal : true
-        })
-    }
-    //TODO: Close modal and change flag
-    closeModalBox = () => {
-        this.setState({
-            openModal : false
-        })
-    }
+
     static getDerivedStateFromProps(nextProps, prevState) { //TODO: To interact to data from api return
         // do things with nextProps.someProp and prevState.cachedSomeProp
-        if (nextProps.userCollection !== prevState.userCollection) {
+        if (nextProps.data !== prevState.userCollection) {
             return {
                 userCollection: nextProps.data,
             }
         }
+        return null
     }
 
     render() {
@@ -78,7 +70,12 @@ export class BasicFlatList extends React.Component {
                             title="Add"
                             color="#40b883"
                             style={{ width: 100, height: 35, marginRight:20 }}
-                            onPress={() => this.openModalBox()}
+                            onPress={() => this.props.openModalAddUser({
+                                title: 'Add User',
+                                id: '',
+                                body: '',
+                                flag: true
+                            })}
                         />
                 </View>
                 <FlatList
@@ -91,7 +88,7 @@ export class BasicFlatList extends React.Component {
                     }}
                 >
                 </FlatList>
-                <AddModal  parentFlatList={this} openModal={this.state.openModal}>
+                <AddModal  parentFlatList={this} >
 
                 </AddModal>
             </View>

@@ -1,18 +1,17 @@
 import React, { Component } from 'react'
 import { StyleSheet, Text, View, Alert } from 'react-native'
-import AuthsActions from '../redux/_user-redux'
+import UsersActions from '../redux/_user-redux'
+import ModalBoxActions from '../redux/_modalBox-redux'
 import { connect } from 'react-redux';
 import Swipeout from 'react-native-swipeout'
 
 const mapDispatchToProps = dispatch => ({
-    deleteUser: (id) => dispatch(AuthsActions.deleteUserRequest(id))
+    deleteUser: (id) => dispatch(UsersActions.deleteUserRequest(id)),
+    openModalEditUser: (info) => dispatch(ModalBoxActions.setInfoModalBox(info))
 })
 
 const mapStateToProps = state => {
     return {
-        processing: state.user.processing,
-        data: state.user.data.userList,
-        error: state.user.error
     }
 }  
 
@@ -20,7 +19,6 @@ export class FlatListItem extends Component {
     state = {
         activeRowKey: null
     }
-
     render() {
         const swipeoutSetting = {
             autoClose: true,
@@ -55,7 +53,12 @@ export class FlatListItem extends Component {
             left: [
                 {
                     onPress: () => {
-                        this.props.parentFlatList.openModalBox()
+                        this.props.openModalEditUser({
+                            title: 'EDIT',
+                            id: this.props.item.id,
+                            body: this.props.item.body,
+                            flag: true
+                        })
                     },
                     text: 'Edit',
                     type:'primary'

@@ -1,22 +1,25 @@
 import React, { Component } from 'react'
 import { View, TextInput, Dimensions, Platform, StyleSheet, Text } from 'react-native'
 import Modal from 'react-native-modalbox'
-import AuthsActions from '../redux/_user-redux'
+import UsersActions from '../redux/_user-redux'
 import { connect } from 'react-redux';
-import Button from 'react-native-button';
-
+import Button from 'react-native-button'
+import ModalBoxActions from '../redux/_modalBox-redux'
 
 
 const mapDispatchToProps = dispatch => ({
-    postUser : (user) => {dispatch(AuthsActions.postUserRequest(user))}
+    postUser : (user) => {dispatch(UsersActions.postUserRequest(user))},
+    changeFlagModalBox : () => {dispatch(ModalBoxActions.changeFlagModalBox())}
 })
 
 const screen = Dimensions.get('window')
 
 const mapStateToProps = state => {
     return {
-        processing: state.user.processing,
-        error: state.user.error
+        title: state.modalBox.data.title,
+        id: state.modalBox.data.id,
+        body: state.modalBox.data.body,
+        flag: state.modalBox.data.flag
     }
 }
 
@@ -24,14 +27,38 @@ export class AddModal extends React.Component {
     constructor(props) {
         super(props)
         this.state = ({
+            title: '',
             id: '',
-            body: ''           
-        })   
+            body: ''          
+        })
     }
+    static getDerivedStateFromProps(nextProps, prevState) { //TODO: To interact to data from api return
+        // do things with nextProps.someProp and prevState.cachedSomeProp
+        if (nextProps.title !== prevState.title) {
+            return {
+                title: nextProps.title,
+                id: nextProps.id,
+                body: nextProps.body,
+            }
+        }
+        return null
+    }
+
+    // componentDidUpdate(prevProps) {
+    //     if(prevProps.title !== this.props.title) {
+    //         this.setState({title: this.props.title})
+    //     }
+    //     if(prevProps.id !== this.props.id) {
+    //         this.setState({id: this.props.id})
+    //     }
+    //     if(prevProps.body !== this.props.body) {
+    //         this.setState({body: this.props.body})
+    //     }
+    // }
     render() {
         return (
             <Modal
-                isOpen={this.props.openModal}
+                isOpen={this.props.flag}
                 style={{
                     justifyContent: 'center',
                     borderRadius: Platform.OS === 'ios' ? 30 : 0,
@@ -42,14 +69,14 @@ export class AddModal extends React.Component {
                 }}
                 position='center'
                 backdrop={true}
-                onClosed={() => {this.props.parentFlatList.closeModalBox()}}
+                onClosed={() => {this.props.changeFlagModalBox()}}
             >
                 <Text style={{
                     fontSize: 16,
                     fontWeight: 'bold',
                     textAlign: 'center',
                     marginTop: 40
-                }}>Add User</Text>
+                }}>{this.state.title}</Text>
                 <TextInput
                     style={styles.inputWrapper}
                     onChangeText={(text) => this.setState({ id: text })}
@@ -76,9 +103,10 @@ export class AddModal extends React.Component {
                                 body: this.state.body,
                             }
                             this.setState({ 
-                                id:'',
-                                body: '' 
+                                    id:'',
+                                    body: ''
                             })
+                            this.props.changeFlagModalBox()
                             this.props.postUser(newUser)
                         }}>
                         Add
