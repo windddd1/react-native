@@ -52,6 +52,7 @@ export class BasicFlatList extends React.Component {
     }
 
     render() {
+        console.log('haha')
         return (
             <View style={{ flex: 1 }}>
                 <Spinner

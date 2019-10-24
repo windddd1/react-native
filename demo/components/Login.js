@@ -3,12 +3,32 @@ import { StyleSheet, View, Image, Text, TextInput, KeyboardAvoidingView, Touchab
 
 
 export default Login = (props) => {
+
+    const [resLogo, setResLogo] = useState(false)
+    useEffect(() => {
+        const keyboardWillShowSub = Keyboard.addListener('keyboardDidShow',keyboardWillShow)
+        const keyboardWillHideSub = Keyboard.addListener('keyboardDidHide', keyboardWillHide)
+        return () => {
+            keyboardWillShowSub.remove()
+            keyboardWillHideSub.remove()
+        }
+    }, [])
+
+    const keyboardWillShow = () => {
+        console.log('abc')
+        setResLogo(true)
+    }
+
+    const keyboardWillHide = () => {
+        setResLogo(false)
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle='light-content'></StatusBar>
-            <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-90} behavior={'padding'}>
+            <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior={'padding'}>
                 <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
-                    <View style={styles.container}>
+                    <View style={!resLogo ? styles.container: styles.resLogoContainer}>
                         <View style={styles.logoContainer}>
                             <Image
                                 source={require('../assests/logo.png')} style={styles.logo}>
@@ -51,7 +71,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
-        paddingTop: -10
+    },
+    resLogoContainer: {
+        flex:1,
+        marginTop: -160
     },
     logo: {
         width: 75,

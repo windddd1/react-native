@@ -22,24 +22,28 @@ const mapStateToProps = state => {
     }
 }
 
-function BasicFlatList(props) {
-    //TODO: declare state
+const BasicFlatList = React.memo(props => {
     const [userCollection, setUserCollection] = useState([])
     const [deleteKey, setDeleteKey] = useState(undefined)
 
     useEffect(() => {
         props.getListUser()
     }, [])
-
-    useMemo(() => {
-        setUserCollection(Object.values(props.data))
-    }, [props.data])
-
+    // useMemo(() => {
+    //     if(props.data.length !== 0) {
+    //         setUserCollection(props.data)
+    //     }
+    // }, [props.data])
+    // useMemo(() => {
+    //     console.log(props)
+    // },[props])
+    // useMemo(() => {
+    //     console.log(userCollection)memo
+    // },[userCollection])
+    
     refreshFlatList = (key) => {
-        console.log(key)
         setDeleteKey(key)
     }
-
     return (
         <View style={{ flex: 1 }}>
             <Spinner
@@ -47,6 +51,7 @@ function BasicFlatList(props) {
                 textContent={'Loading...'}
                 textStyle={styles.spinnerTextStyle}
             />
+            {console.log(123)}
             <View style={{
                 backgroundColor: '#435b71',
                 flexDirection: 'row',
@@ -67,7 +72,7 @@ function BasicFlatList(props) {
                 />
             </View>
             <FlatList
-                data={userCollection}
+                data={props.data}
                 keyExtractor={(item, index) => index.toString()}    //TODO:Chosse key for a item
                 renderItem={({ item, index }) => {
                     return (
@@ -81,7 +86,8 @@ function BasicFlatList(props) {
             </AddModal>
         </View>
     )
-}
+})
+
 
 const styles = StyleSheet.create({
     flatListItem: {

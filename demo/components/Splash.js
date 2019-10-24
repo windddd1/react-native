@@ -13,13 +13,14 @@ export default Splash = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: 'rgb(32, 53, 70)',
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center'
     },
     title: {
         fontWeight: 'bold',
-        fontSize: 18
+        fontSize: 28,
+        color: 'white'
     }
 })

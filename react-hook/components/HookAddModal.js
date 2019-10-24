@@ -40,7 +40,6 @@ function AddModal (props) {
     useMemo(() => {
         setBody(props.body)
     },[props.body])
-
     return (
         <Modal
             isOpen={props.flag}
