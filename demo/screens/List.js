@@ -1,8 +1,7 @@
 import React,{ useState, useEffect, useMemo, Component } from 'react';
-import { StyleSheet, View, Text, ScrollView, Dimensions, ImageBackground, FlatList, Image  } from 'react-native'
+import { StyleSheet, View, Text, ScrollView, Dimensions, ImageBackground, FlatList, Image, Animated  } from 'react-native'
 import Items from '../constants/mocks'
-import { objectMethod } from '@babel/types';
-import { ThemeColors } from 'react-navigation';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const { width, height } = Dimensions.get('screen')
 
@@ -82,16 +81,16 @@ const styles = StyleSheet.create({
             width: 0,
             height: 6,
         },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0.07,
         shadowRadius: 10,
         elevation: 5,
     },
     dots: {
-        width: 10,
-        height: 10,
+        width: 9,
+        height: 9,
         borderRadius: 6,
-        borderWidth:2,
-        borderColor: 'transparent',
+        borderWidth:0.5,
+        borderColor: '#007BFA',
         marginHorizontal: 4
     },
     activeDot: {
@@ -112,11 +111,21 @@ const styles = StyleSheet.create({
         color:'white',
         marginTop:10,
         marginLeft:10
+    },
+    cardRecomedation : {
+        height:height*0.10,
+        borderWidth: 0.05,
+        marginBottom:10,
+        paddingTop:10, 
+        paddingLeft:10,
+        backgroundColor: 'white',
+        borderBottomRightRadius: 12,
+        borderBottomLeftRadius: 12
     }
 })
 
 export default List = (props) => {
-
+    scrollx = new Animated.Value(0)
     renderDestinations = () => {
         return (
             <View style={[ {flex:0.55}, styles.column]}>
@@ -126,8 +135,10 @@ export default List = (props) => {
                     scrollEnabled
                     showsHorizontalScrollIndicator={false}
                     scrollEventThrottle={16}
+                    decelerationRate={0}
                     snapToAlignment="center"
                     data={Items}
+                    onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollx }} }])}
                     keyExtractor={( item,index ) => `${item.id}`}
                     renderItem={({item}) => renderDestinationItem(item)}
                 >
@@ -164,14 +175,25 @@ export default List = (props) => {
         )
     }
     renderDots = () => {
+        const dotPosition = Animated.divide(scrollx, width)
         return (
             <View style={[ styles.row, {justifyContent: 'center'}]}>
                 {
-                    Items.map(item => {
+                    Items.map((item, index) => {
+                        const borderWidth = dotPosition.interpolate({
+                            inputRange: [index -1, index, index + 1],
+                            outputRange: [0, 2, 0],
+                            extrapolate: 'clamp'
+                        })
+                        const backgroundColor = dotPosition.interpolate({
+                            inputRange: [index -1, index, index + 1],
+                            outputRange: ['#DCE0E9', 'white', '#DCE0E9'],
+                            extrapolate: 'clamp'
+                        })
                         return (
-                            <View key={`step-${item.id}`} style={[styles.dots, item.id === 1 ? styles.activeDot:styles.nonActiveDot]}>
-                                
-                            </View>
+                            <Animated.View key={`step-${item.id}`} 
+                                style={[styles.dots, { borderWidth: borderWidth,backgroundColor:backgroundColor }]}
+                            />
                         )
                     })
                 }
@@ -179,20 +201,26 @@ export default List = (props) => {
         )
     }
     renderRecommendation = (item,index) => {
-        let margin = { marginRight:18 }
+        let margin = { marginRight:23 }
         index === 0 ? margin = styles.fisrtRecommendation: ''
         index === Items.length - 1 ? margin = styles.lastRecommendation: ''
         return (
             <View>
                 <ImageBackground
-                    style={[margin,{width: width*0.33, height: height*0.18,marginTop:15}]}
+                    style={[margin,{width: width*0.29, height: height*0.15,marginTop:15}]}
                     imageStyle={{ borderTopRightRadius: 12,borderTopLeftRadius: 12 }}
                     source={{ uri: item.preview }}
                 >
                 <View>
                     <Text style={styles.contentRecomedation}>{item.temperature}℃</Text>
+                    <Icon name="rocket" size={50} color="#900" />
                 </View>
                 </ImageBackground>
+                <View style={[margin,styles.shadow,styles.cardRecomedation]}>
+                    <Text style={{ fontSize:14, fontWeight: '500'}}>{item.title}</Text>
+                    <Text style={{ color:'#BCCCD4'}}>{item.location}</Text>
+                    <Text style={{ color: '#007BFA'}}>{item.rating}</Text>
+                </View>
             </View>
         )
     }
