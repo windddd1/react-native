@@ -1,9 +1,11 @@
 import React,{ useState, useEffect, useMemo, Component } from 'react';
-import { StyleSheet, View, Text, ScrollView, Dimensions, ImageBackground, FlatList, Image, Animated  } from 'react-native'
+import { StyleSheet, View, Text, ScrollView, Dimensions, ImageBackground, FlatList, TouchableOpacity, Image, Animated  } from 'react-native'
 import Items from '../constants/mocks'
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/FontAwesome'
+import Octicons from 'react-native-vector-icons/Octicons'
 
 const { width, height } = Dimensions.get('screen')
+
 
 const styles = StyleSheet.create({
     flex: {
@@ -32,10 +34,13 @@ const styles = StyleSheet.create({
     // articles: {
     //     paddingHorizontal: 36,
     // },
-    destination: {
+    containerDestination: {
         width: width - (36 * 2),
-        height: width * 0.55,
-        marginHorizontal: 36,
+        height: width * 0.7,
+        marginHorizontal:36,
+        borderRadius: 12
+    },
+    destination: {
         paddingHorizontal:36,
         paddingVertical:24,
         borderRadius: 12,
@@ -45,7 +50,7 @@ const styles = StyleSheet.create({
     destinationInfo: {
         position: 'absolute',
         height: width * 0.25,
-        paddingVertical: 20,
+        paddingVertical: 16,
         paddingHorizontal: 36,
         bottom: -36,
         right: 36,
@@ -86,19 +91,16 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     dots: {
-        width: 9,
-        height: 9,
+        width: 11,
+        height: 11,
         borderRadius: 6,
         borderWidth:0.5,
-        borderColor: '#007BFA',
+        borderColor: '#1876FE',
         marginHorizontal: 4
     },
     activeDot: {
-        borderColor: '#007BFA',
+        borderColor: '#1876FE',
         backgroundColor: 'white'
-    },
-    nonActiveDot: {
-        backgroundColor: '#DCE0E9',
     },
     fisrtRecommendation: {
         marginLeft: 36,
@@ -108,12 +110,11 @@ const styles = StyleSheet.create({
         marginRight: 36
     },
     contentRecomedation: {
+        fontSize:16,
         color:'white',
-        marginTop:10,
-        marginLeft:10
     },
     cardRecomedation : {
-        height:height*0.10,
+        height:height*0.11,
         borderWidth: 0.05,
         marginBottom:10,
         paddingTop:10, 
@@ -125,6 +126,7 @@ const styles = StyleSheet.create({
 })
 
 export default List = (props) => {
+
     scrollx = new Animated.Value(0)
     renderDestinations = () => {
         return (
@@ -150,28 +152,33 @@ export default List = (props) => {
 
     renderDestinationItem = (item) => {
         return (
-            <ImageBackground 
-                style={[styles.flex, styles.destination, styles.shadow]}
-                imageStyle={{ borderRadius: 12 }}
-                source={{ uri: item.preview }}
-            >
-                <View style={[styles.row]}>
-                    <View>
-                        <Image source={{ uri:item.user.avatar }} style={styles.avatar}/>
+            <TouchableOpacity  style={styles.containerDestination} activeOpacity={0.95} onPress={()=>{props.navigation.navigate('Article', { article: item })}}>
+                <ImageBackground 
+                    style={[styles.flex, styles.destination, styles.shadow]}
+                    imageStyle={{ borderRadius: 12 }}
+                    source={{ uri: item.preview }}
+                >
+                    <View style={[styles.row]}>
+                        <View>
+                            <Image source={{ uri:item.user.avatar }} style={styles.avatar}/>
+                        </View>
+                        <View style={[ styles.column, {paddingHorizontal: 20}]}>
+                                <Text style={styles.name}>{item.user.name}</Text>
+                                <Text style={[styles.location]}><Icon name="map-marker" size={12} color="#eeeeee"/> {item.location}</Text>
+                        </View>
+                        <View style={[styles.flex,{ alignItems: 'flex-end'}]}>
+                            <Text style={styles.rating}>{item.rating} <Icon name="star" size={22}/></Text>
+                        </View>
                     </View>
-                    <View style={[ styles.column, {paddingHorizontal: 26}]}>
-                            <Text style={styles.name}>{item.user.name}</Text>
-                            <Text style={styles.location}>{item.location}</Text>
+                    <View style={[styles.destinationInfo,styles.shadow]}>
+                        <Text style={{ fontWeight: '500', fontSize: 18, paddingVertical: 4}}>{item.title}</Text>
+                        <View style={[styles.row,{alignItems:'flex-end',justifyContent:'space-between'}]}>
+                            <Text style={{ color: '#BDBDBD', fontSize:12}}>{item.description.slice(0, 60)}{item.description.length > 60 ? '...' : ''}</Text>
+                            <Icon name="chevron-right" size={12} color='#BDBDBD' />
+                        </View>
                     </View>
-                    <View style={[styles.flex,{ alignItems: 'flex-end'}]}>
-                        <Text style={styles.rating}>{item.rating}</Text>
-                    </View>
-                </View>
-                <View style={[styles.destinationInfo,styles.shadow]}>
-                    <Text style={{ fontWeight: '500', fontSize: 18, paddingVertical: 4}}>{item.title}</Text>
-                    <Text style={{ color: 'grey', fontSize:12}}>{item.description}</Text>
-                </View>
-            </ImageBackground>
+                </ImageBackground>
+            </TouchableOpacity>
         )
     }
     renderDots = () => {
@@ -200,6 +207,25 @@ export default List = (props) => {
             </View>
         )
     }
+    renderRating = (rating) => {
+        const stars = new Array(5).fill(0)
+        return (
+            stars.map((item, index) => {
+                let activeStar
+                Math.floor(rating) >= (index + 1) ? activeStar = true : activeStar = false
+                return ( 
+                    <Text key={`star-${index}`} style={{paddingRight:10}}>
+                        <Icon
+                        name="star"
+                        size={12}
+                        color={activeStar ? '#1876FE' : '#BBDEFB'}
+                        />
+                        <Text> </Text>
+                    </Text>
+                )
+            })
+        )
+    }
     renderRecommendation = (item,index) => {
         let margin = { marginRight:23 }
         index === 0 ? margin = styles.fisrtRecommendation: ''
@@ -211,15 +237,15 @@ export default List = (props) => {
                     imageStyle={{ borderTopRightRadius: 12,borderTopLeftRadius: 12 }}
                     source={{ uri: item.preview }}
                 >
-                <View>
+                <View style={[styles.row,{marginTop:10,justifyContent:'space-between',paddingHorizontal:10}]}>
                     <Text style={styles.contentRecomedation}>{item.temperature}℃</Text>
-                    <Icon name="rocket" size={50} color="#900" />
+                    <TouchableOpacity onPress={() =>{ item.saved = !item.saved} }><Icon name={item.saved ? 'bookmark' : 'bookmark-o'} size={18} color="#eeeeee"/></TouchableOpacity>
                 </View>
                 </ImageBackground>
                 <View style={[margin,styles.shadow,styles.cardRecomedation]}>
                     <Text style={{ fontSize:14, fontWeight: '500'}}>{item.title}</Text>
-                    <Text style={{ color:'#BCCCD4'}}>{item.location}</Text>
-                    <Text style={{ color: '#007BFA'}}>{item.rating}</Text>
+                    <Text style={{ color:'#BDBDBD'}}>{item.location}</Text>
+                    <Text style={{ color: '#1876FE',marginTop:3}}>{renderRating(item.rating)} {item.rating}</Text>
                 </View>
             </View>
         )
@@ -228,8 +254,8 @@ export default List = (props) => {
         return (
             <View style={[ {flex:0.45}, styles.column, styles.recommended, styles.shadow]}>
                 <View style={{flexDirection: 'row',justifyContent:'space-between',alignItems:'flex-end',paddingHorizontal:36}}>
-                    <Text style={{fontSize:18, fontWeight:'600'}}>Recommended</Text>
-                    <Text style={{color:'#BCCCD4'}}>More</Text>
+                    <Text style={{fontSize:18, fontWeight:'700'}}>Recommended</Text>
+                    <Text style={{color:'#BDBDBD',fontWeight:'700'}}>More</Text>
                 </View>
                 <View style={[styles.column, styles.recommendedList]}>
                     <FlatList
@@ -247,7 +273,7 @@ export default List = (props) => {
             </View>
         )
     }
-
+    
     return (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.flex, styles.articles]}>
             {renderDestinations()}
@@ -260,8 +286,8 @@ List.navigationOptions = {
     header: (
         <View style={[ styles.row, styles.header, styles.layoutHeader]}>
             <View>
-                <Text>Search for place</Text>
-                <Text style={{ fontSize: 24 }}>Destination</Text>
+                <Text style={{color:'#BDBDBD',fontWeight:'700', fontSize:12}}>Search for place</Text>
+                <Text style={{ fontSize: 24 , fontWeight:'700'}}>Destination</Text>
             </View>
             <View>
                 <Image style={styles.avatar} source={{uri :'https://cloudcone.com/wp-content/uploads/2019/03/blank-avatar.jpg'}}></Image>

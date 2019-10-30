@@ -11,6 +11,7 @@ export default createStackNavigator(
     },
     {
         initialRouteName: "List",
+        headerMode: 'screen'
     },
     
 );
