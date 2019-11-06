@@ -1,14 +1,15 @@
 
 import React,{ useState, useEffect, useMemo, Component } from 'react'
-import { Container, Header, Tab, Tabs, ScrollableTab ,Item, Picker} from 'native-base'
+import {  Tab, Tabs, ScrollableTab ,Item, Picker} from 'native-base'
 import { StyleSheet, Dimensions, View, Text , Button,Alert} from 'react-native'
-import Canlendar from '../components/Canlendar'
 import Feather from 'react-native-vector-icons/Feather'
 import XLSX from 'xlsx'
 
 
+
+
 import { writeFile, readFile, DocumentDirectoryPath,ExternalDirectoryPath } from 'react-native-fs';
-const DDP = DocumentDirectoryPath + "/";
+const DDP = ExternalDirectoryPath + "/";
 const input = res => res;
 const output = str => str;
 
@@ -47,30 +48,13 @@ const styles = StyleSheet.create({
 
 export default CreateInfo = (props) => {
     const [file, setFile] = useState()
-    useEffect(() => {
-//         console.log(DocumentDirectoryPath)
-//         var path = DocumentDirectoryPath + '/test.txt';
-//         console.log(ExternalDirectoryPath)
-// // write the file
-// readFile(path,'ascii').then((res) => {
-//     console.log(123)
-// })
-// writeFile(path, 'Lorem ipsum dolor sit amet', 'utf8')
-//   .then((success) => {
-//     console.log('FILE WRITTEN!');
-//   })
-//   .catch((err) => {
-//     console.log(err.message);
-//   });
-  
-
-    },[])
+    
 
     importFile = () => {
 		Alert.alert("Rename file to sheetjs.xlsx", "Copy to " + DDP, [
 			{text: 'Cancel', onPress: () => {}, style: 'cancel' },
 			{text: 'Import', onPress: () => {
-				readFile(DDP + "sheetjs.xlsx", 'ascii').then((res) => {
+				readFile(DDP + "schedule.xlsx", 'ascii').then((res) => {
 					/* parse file */
 					const wb = XLSX.read(input(res), {type:'binary'});
 
@@ -78,13 +62,36 @@ export default CreateInfo = (props) => {
 					const wsname = wb.SheetNames[0];
 					const ws = wb.Sheets[wsname];
 					const data = XLSX.utils.sheet_to_json(ws, {header:1});
-
+                    let collection = []
 					/* update state */
-					console.log(data)
+                    data.forEach((item) => {
+                        if(['2','3','4','5','6','7'].includes(item[0])) {
+                            collection.push(item)
+                            console.log(item[2])
+                        }
+                    })
+                    console.log(collection)
 				}).catch((err) => { Alert.alert("importFile Error", "Error " + err.message); });
 			}}
 		]);
-	}
+    }
+    
+    // async function requestCameraPermission() {
+    //     try {
+    //       const granted = await PermissionsAndroid.request(
+    //         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+            
+    //       )
+    //       console.log(granted)
+    //       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    //         console.log('You can use ');
+    //       } else {
+    //         console.log('denied');
+    //       }
+    //     } catch (err) {
+    //       console.warn(err);
+    //     }
+    //   }
 
     return (
         <View style={[styles.flex,{backgroundColor:'#F9F9FB'}]}>
