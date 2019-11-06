@@ -17,6 +17,7 @@
     "react-native": "0.61.2",
     "react-native-button": "^2.4.0",
     "react-native-calendars": "^1.212.0",
+    "react-native-fs": "^2.16.1",
     "react-native-gesture-handler": "^1.4.1",
     "react-native-loading-spinner-overlay": "^1.0.1",
     "react-native-modalbox": "^2.0.0",
@@ -33,7 +34,8 @@
     "redux": "4.0.4",
     "redux-modal": "^3.0.2",
     "redux-saga": "^1.1.1",
-    "reduxsauce": "^1.1.0"
+    "reduxsauce": "^1.1.0",
+    "xlsx": "^0.15.1"
   },
   "devDependencies": {
     "@babel/core": "7.6.4",

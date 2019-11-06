@@ -1,9 +1,17 @@
 
 import React,{ useState, useEffect, useMemo, Component } from 'react'
 import { Container, Header, Tab, Tabs, ScrollableTab ,Item, Picker} from 'native-base'
-import { StyleSheet, Dimensions, View, Text } from 'react-native'
+import { StyleSheet, Dimensions, View, Text , Button,Alert} from 'react-native'
 import Canlendar from '../components/Canlendar'
 import Feather from 'react-native-vector-icons/Feather'
+import XLSX from 'xlsx'
+
+
+import { writeFile, readFile, DocumentDirectoryPath,ExternalDirectoryPath } from 'react-native-fs';
+const DDP = DocumentDirectoryPath + "/";
+const input = res => res;
+const output = str => str;
+
 
 const { width, height } = Dimensions.get('screen')
 
@@ -37,7 +45,47 @@ const styles = StyleSheet.create({
     },
 })
 
-export default Schedule = (props) => {
+export default CreateInfo = (props) => {
+    const [file, setFile] = useState()
+    useEffect(() => {
+//         console.log(DocumentDirectoryPath)
+//         var path = DocumentDirectoryPath + '/test.txt';
+//         console.log(ExternalDirectoryPath)
+// // write the file
+// readFile(path,'ascii').then((res) => {
+//     console.log(123)
+// })
+// writeFile(path, 'Lorem ipsum dolor sit amet', 'utf8')
+//   .then((success) => {
+//     console.log('FILE WRITTEN!');
+//   })
+//   .catch((err) => {
+//     console.log(err.message);
+//   });
+  
+
+    },[])
+
+    importFile = () => {
+		Alert.alert("Rename file to sheetjs.xlsx", "Copy to " + DDP, [
+			{text: 'Cancel', onPress: () => {}, style: 'cancel' },
+			{text: 'Import', onPress: () => {
+				readFile(DDP + "sheetjs.xlsx", 'ascii').then((res) => {
+					/* parse file */
+					const wb = XLSX.read(input(res), {type:'binary'});
+
+					/* convert first worksheet to AOA */
+					const wsname = wb.SheetNames[0];
+					const ws = wb.Sheets[wsname];
+					const data = XLSX.utils.sheet_to_json(ws, {header:1});
+
+					/* update state */
+					console.log(data)
+				}).catch((err) => { Alert.alert("importFile Error", "Error " + err.message); });
+			}}
+		]);
+	}
+
     return (
         <View style={[styles.flex,{backgroundColor:'#F9F9FB'}]}>
         <View style={{flex:0.2, backgroundColor:'#D4E7FE'}}>
@@ -62,7 +110,8 @@ export default Schedule = (props) => {
         <Tabs style={{marginHorizontal:36}} tabBarUnderlineStyle={{backgroundColor:'#D4E7FE'}} renderTabBar={()=> <ScrollableTab style={{backgroundColor:'#FFFFFF'}}/>}>
             <Tab heading="Tab1" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF',borderTopLeftRadius:30}} style={{borderRadius:30}}>
                 <View>
-                      
+                <Text style={styles.instructions}>Import Data</Text>
+	                <Button onPress={importFile()} title="Import data from a spreadsheet" color="#841584" />
                 </View>
             </Tab>
             <Tab heading="Tab2" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF'}} >
