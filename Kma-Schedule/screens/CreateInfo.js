@@ -49,49 +49,51 @@ const styles = StyleSheet.create({
 export default CreateInfo = (props) => {
     const [file, setFile] = useState()
     
-
+    
     importFile = () => {
-		Alert.alert("Rename file to sheetjs.xlsx", "Copy to " + DDP, [
-			{text: 'Cancel', onPress: () => {}, style: 'cancel' },
-			{text: 'Import', onPress: () => {
-				readFile(DDP + "schedule.xlsx", 'ascii').then((res) => {
-					/* parse file */
-					const wb = XLSX.read(input(res), {type:'binary'});
+		readFile(DDP + "schedule.xlsx", 'ascii').then((res) => {
+            /* parse file */
+            const wb = XLSX.read(input(res), {type:'binary'});
 
-					/* convert first worksheet to AOA */
-					const wsname = wb.SheetNames[0];
-					const ws = wb.Sheets[wsname];
-					const data = XLSX.utils.sheet_to_json(ws, {header:1});
-                    let collection = []
-					/* update state */
-                    data.forEach((item) => {
-                        if(['2','3','4','5','6','7'].includes(item[0])) {
-                            collection.push(item)
-                            console.log(item[2])
+            /* convert first worksheet to AOA */
+            const wsname = wb.SheetNames[0];
+            const ws = wb.Sheets[wsname];
+            const data = XLSX.utils.sheet_to_json(ws, {header:1})
+            let collection = []
+            let schedule = []
+            /* update state */
+            data.forEach((item) => {
+                if(['2','3','4','5','6','7'].includes(item[0])) {
+                    collection.push(item)
+                }
+            })
+            console.log(collection)
+            collection.forEach((item) => {
+                let startDate = `${item[10].slice(0,10).slice(3,5)}/${item[10].slice(0,10).slice(0,2)}/${item[10].slice(0,10).slice(6,10)}`
+                let endDate = `${item[10].slice(11).slice(3,5)}/${item[10].slice(11).slice(0,2)}/${item[10].slice(11).slice(6,10)}`
+                for (let d = new Date(startDate); d <= new Date(endDate); d.setDate(d.getDate() + 1)) {
+                    if(new Date(d).getDay()+1 == item[0]) {
+                        let day = new Date(d).toLocaleDateString("en-US")
+                        let dayConvert = day.slice(6,10)+'-'+day.slice(0,2)+'-'+day.slice(3,5)
+                        schedule = {
+                            ...schedule,
+                            dayConvert
                         }
-                    })
-                    console.log(collection)
-				}).catch((err) => { Alert.alert("importFile Error", "Error " + err.message); });
-			}}
-		]);
+                    }
+                }
+                // '2019-11-06': [{
+                //     id: '1',
+                //     start: '07:00 AM',
+                //     end: '09:30 AM',
+                //     name: 'The Basic of Typography',
+                //     location: 'Room 204',
+                //     teacher: 'Do Tuan Anh'
+                // },
+            })
+            
+        }).catch((err) => { Alert.alert("importFile Error", "Error " + err.message); });
     }
     
-    // async function requestCameraPermission() {
-    //     try {
-    //       const granted = await PermissionsAndroid.request(
-    //         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-            
-    //       )
-    //       console.log(granted)
-    //       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    //         console.log('You can use ');
-    //       } else {
-    //         console.log('denied');
-    //       }
-    //     } catch (err) {
-    //       console.warn(err);
-    //     }
-    //   }
 
     return (
         <View style={[styles.flex,{backgroundColor:'#F9F9FB'}]}>
@@ -118,7 +120,7 @@ export default CreateInfo = (props) => {
             <Tab heading="Tab1" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF',borderTopLeftRadius:30}} style={{borderRadius:30}}>
                 <View>
                 <Text style={styles.instructions}>Import Data</Text>
-	                <Button onPress={importFile()} title="Import data from a spreadsheet" color="#841584" />
+	                <Button onPress={()=>{importFile()}} title="Import data from a spreadsheet" color="#841584" />
                 </View>
             </Tab>
             <Tab heading="Tab2" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF'}} >

@@ -113,7 +113,7 @@ export default Canlendar = (props) => {
                 name: 'Programing C++',
                 location: 'Room 304',
                 teacher: 'Nguyen Anh Tien'
-            },],
+            },]
     }
 
     renderClass = (item) => {
