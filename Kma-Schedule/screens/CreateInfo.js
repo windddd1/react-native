@@ -61,36 +61,59 @@ export default CreateInfo = (props) => {
             const data = XLSX.utils.sheet_to_json(ws, {header:1})
             let collection = []
             let schedule = []
-            /* update state */
             data.forEach((item) => {
                 if(['2','3','4','5','6','7'].includes(item[0])) {
+                    let flagTime = item[8].split(',')[0]
+                    if(flagTime == 1) {
+                        item[8] = '07:00 AM'
+                    } else if(flagTime == 4) {
+                        item[8] = '09:30 AM'
+                    } else if(flagTime == 7) {
+                        item[8] = '12:30 PM'
+                    } else if(flagTime == 10) {
+                        item[8] = '15:00 PM'
+                    } else if(flagTime == 13) {
+                        item[8] = '18:00 PM'
+                    } else if(flagTime == 9) {
+                        item[8] = '14:15 PM'
+                    }
                     collection.push(item)
                 }
             })
-            console.log(collection)
             collection.forEach((item) => {
                 let startDate = `${item[10].slice(0,10).slice(3,5)}/${item[10].slice(0,10).slice(0,2)}/${item[10].slice(0,10).slice(6,10)}`
                 let endDate = `${item[10].slice(11).slice(3,5)}/${item[10].slice(11).slice(0,2)}/${item[10].slice(11).slice(6,10)}`
                 for (let d = new Date(startDate); d <= new Date(endDate); d.setDate(d.getDate() + 1)) {
                     if(new Date(d).getDay()+1 == item[0]) {
-                        let day = new Date(d).toLocaleDateString("en-US")
-                        let dayConvert = day.slice(6,10)+'-'+day.slice(0,2)+'-'+day.slice(3,5)
-                        schedule = {
-                            ...schedule,
-                            dayConvert
-                        }
+                        let day = new Date(d).toLocaleDateString("en-US").split('/')
+                        let dayConvert = day[1]+'-'+day[0]+'-'+day[2]
+                        schedule.push({
+                            day: dayConvert,
+                            id: item[1],
+                            dayOfWeek: item[0],
+                            nameClass: item[4],
+                            location: item[9],
+                            teacher: item[7],
+                            time: item[8]
+                        })
                     }
                 }
-                // '2019-11-06': [{
-                //     id: '1',
-                //     start: '07:00 AM',
-                //     end: '09:30 AM',
-                //     name: 'The Basic of Typography',
-                //     location: 'Room 204',
-                //     teacher: 'Do Tuan Anh'
-                // },
             })
-            
+            let objItems = schedule.reduce(function (result, item) {
+                if(!result[item.day]) {
+                    result[item.day] = [{
+                        ...item
+                    }]
+                } else {
+                    result[item.day].push({...item})
+                    console.log(result[item.day])
+                    result[item.day].sort((a, b) => {
+                        return parseInt(a.time.split(':')[0]) - parseInt(b.time.split(':')[0])
+                    })
+                    console.log(result[item.day])
+                }
+                return result
+            }, {})
         }).catch((err) => { Alert.alert("importFile Error", "Error " + err.message); });
     }
     
@@ -120,7 +143,7 @@ export default CreateInfo = (props) => {
             <Tab heading="Tab1" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF',borderTopLeftRadius:30}} style={{borderRadius:30}}>
                 <View>
                 <Text style={styles.instructions}>Import Data</Text>
-	                <Button onPress={()=>{importFile()}} title="Import data from a spreadsheet" color="#841584" />
+                    <Button onPress={()=>{importFile()}} title="Import data from a spreadsheet" color="#841584" />
                 </View>
             </Tab>
             <Tab heading="Tab2" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF'}} >

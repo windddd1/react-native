@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, Component } from 'react';
-import { StyleSheet, View, Text, Dimensions } from 'react-native'
+import { StyleSheet, View, Text, Dimensions,Alert } from 'react-native'
 import { Agenda } from 'react-native-calendars'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Mdi from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
     },
     containerClasses: {
         backgroundColor:'#F9F9FA',
-        height:height*0.1,borderRadius:12,
+        height:height*0.15,
+        borderRadius:12,
         marginVertical:height*0.01,
         marginRight:width*0.02
     },
@@ -65,57 +66,11 @@ export default Canlendar = (props) => {
         dayTextColor: '#606070',
         agendaTodayColor: '#272F5E'
     }
-    const classes = {
-            '2019-11-04': [{
-                id: '1',
-                start: '07:00 AM',
-                end: '09:30 AM',
-                name: 'The Basic of Typography',
-                location: 'Room 204',
-                teacher: 'Do Tuan Anh'
-            },
-            {
-                id: '2',
-                start: '09:30 AM',
-                end: '11:30 AM',
-                name: 'Programing C++',
-                location: 'Room 304',
-                teacher: 'Nguyen Anh Tien'
-            },],
-            '2019-11-05': [{
-                id: '1',
-                start: '07:00 AM',
-                end: '09:30 AM',
-                name: 'The Basic of Typography',
-                location: 'Room 204',
-                teacher: 'Do Tuan Anh'
-            },
-            {
-                id: '2',
-                start: '09:30 AM',
-                end: '11:30 AM',
-                name: 'Programing C++',
-                location: 'Room 304',
-                teacher: 'Nguyen Anh Tien'
-            },],
-            '2019-11-06': [{
-                id: '1',
-                start: '07:00 AM',
-                end: '09:30 AM',
-                name: 'The Basic of Typography',
-                location: 'Room 204',
-                teacher: 'Do Tuan Anh'
-            },
-            {
-                id: '2',
-                start: '09:30 AM',
-                end: '11:30 AM',
-                name: 'Programing C++',
-                location: 'Room 304',
-                teacher: 'Nguyen Anh Tien'
-            },]
-    }
 
+    const [classes,setClasses] = useState()
+    useEffect(()=>{
+        
+    },[])
     renderClass = (item) => {
         return (
         <View style={[styles.containerClasses,styles.shadow,styles.row]}>
@@ -137,8 +92,7 @@ export default Canlendar = (props) => {
     return (
         <Agenda
             items={classes}
-            loadItemsForMonth={(month) => {  }}
-            refreshing={false}
+            refreshing={false} 
             renderEmptyData={() => { return (<Text>No Data</Text>) }}
             rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
             renderItem={(item, firstItemInDay) => renderClass(item)}
