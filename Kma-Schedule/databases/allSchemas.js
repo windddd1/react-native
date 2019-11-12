@@ -55,6 +55,20 @@ export const insertDays = (days) => new Promise((resolve, reject) =>{
     })
 })
 
+export const insertDay = (scheduleId, day) => new Promise((resolve, rejecet) => {
+    Realm.open(databaseOption)
+    .then(realm => {
+        let schedule = realm.objectForPrimaryKey(SCHEDULE_SCHEMA,scheduleId)
+        realm.write(() => {
+            schedule.days.push(day)           
+        })
+
+    }).catch((err) => {
+        console.log(err)
+        reject(err)
+    })
+})
+
 export const queryDays = () => new Promise((resolve, reject) => {
     Realm.open(databaseOption)
     .then(realm => {

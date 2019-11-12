@@ -5,7 +5,7 @@ import { StyleSheet, Dimensions, View, Text , Button,Alert} from 'react-native'
 import Feather from 'react-native-vector-icons/Feather'
 import XLSX from 'xlsx'
 
-import { insertDays, queryDays} from '../databases/allSchemas'
+import { insertDays, queryDays,insertDay } from '../databases/allSchemas'
 
 
 import { writeFile, readFile, DocumentDirectoryPath,ExternalDirectoryPath } from 'react-native-fs';
@@ -57,22 +57,20 @@ export default CreateInfo = (props) => {
             let month = time[0].length=== 1 ? '0'+time[0] : time[0]
             let day = time[1].length=== 1 ? '0'+time[1] : time[1]
             let dayConvert = '20'+time[2]+'-'+month+'-'+ day
-            days.push({
+            insertDay(1,{
                 day: dayConvert,
                 events: []
             })
+            .then(()=>{
+                console.log('completed')
+            }).catch((err) => {
+                console.log(err)
+            })
         }
-        insertDays({id:1,days:days})
-        .then(()=>{
-            console.log('completed')
-        }).catch((err) => {
-            console.log(err)
-        })
-        
     }
     query = () => {
         queryDays().then((res) => {
-            console.log(res)
+            console.log(res.length)
         }).catch(err => {
             console.log(err)
         })
