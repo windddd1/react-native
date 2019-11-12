@@ -38,6 +38,8 @@ target 'tutorial2' do
 
   pod 'react-native-viewpager', :path => '../node_modules/@react-native-community/viewpager'
 
+  pod 'RealmJS', :path => '../node_modules/realm'
+
   target 'tutorial2Tests' do
     inherit! :search_paths
     # Pods for testing

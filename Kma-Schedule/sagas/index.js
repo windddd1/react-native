@@ -7,6 +7,6 @@ import ScheduleSagas from './_schedule-sagas'
 
 export default function* root() {
     yield all([
-        takeLatest(ScheduleTypes.GET_SCHEDULE_REQUEST, ScheduleSagas.getSchedule), //TODO: run side effects(wachter)
+        takeLatest(ScheduleTypes.GET_SCHEDULE_REQUEST, ScheduleSagas.getDataFromExcel), //TODO: run side effects(wachter)
     ])
 }

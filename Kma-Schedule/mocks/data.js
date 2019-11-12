@@ -109,5 +109,54 @@ const classes = {
         name: 'Programing C++',
         location: 'Room 304',
         teacher: 'Nguyen Anh Tien'
+    },],
+    '2019-11-13': [{
+        id: '1',
+        start: '07:00 AM',
+        end: '09:30 AM',
+        name: 'The Basic of Typography',
+        location: 'Room 204',
+        teacher: 'Do Tuan Anh'
+    },
+    {
+        id: '2',
+        start: '09:30 AM',
+        end: '11:30 AM',
+        name: 'Programing C++',
+        location: 'Room 304',
+        teacher: 'Nguyen Anh Tien'
+    },],
+    '2019-11-14': [{
+        id: '1',
+        start: '07:00 AM',
+        end: '09:30 AM',
+        name: 'The Basic of Typography',
+        location: 'Room 204',
+        teacher: 'Do Tuan Anh'
+    },
+    {
+        id: '2',
+        start: '09:30 AM',
+        end: '11:30 AM',
+        name: 'Programing C++',
+        location: 'Room 304',
+        teacher: 'Nguyen Anh Tien'
+    },],
+    '2019-11-15': [],
+    '2019-11-16': [{
+        id: '1',
+        start: '07:00 AM',
+        end: '09:30 AM',
+        name: 'The Basic of Typography',
+        location: 'Room 204',
+        teacher: 'Do Tuan Anh'
+    },
+    {
+        id: '2',
+        start: '09:30 AM',
+        end: '11:30 AM',
+        name: 'Programing C++',
+        location: 'Room 304',
+        teacher: 'Nguyen Anh Tien'
     },]
 }

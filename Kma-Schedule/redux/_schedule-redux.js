@@ -2,7 +2,7 @@ import { createReducer, createActions } from 'reduxsauce'
 
 const { Types, Creators } = createActions({
     getScheduleRequest: [],
-    getScheduleSucces: ['classes'],
+    getScheduleSuccess: ['classes'],
     getScheduleFail: ['error']
 })
 
@@ -22,7 +22,7 @@ export const request = state => {
     return { ...state, processing: true} 
 }
 
-export const getScheduleSucces = (state, {classes}) => {
+export const getScheduleSuccess = (state, {classes}) => {
     return { ...state, processing: false, data:{
         classes : classes
     }}
@@ -34,6 +34,6 @@ export const fail = (state, {error}) => {
 
 export const reducer = createReducer( INITIAL_STATE ,{
     [ScheduleTypes.GET_SCHEDULE_REQUEST]: request,
-    [ScheduleTypes.GET_SCHEDULE_SUCCESS] : getScheduleSucces,
-    [ScheduleTypes.GET_SCHEDULE_FAIL] : getScheduleFail
+    [ScheduleTypes.GET_SCHEDULE_SUCCESS] : getScheduleSuccess,
+    [ScheduleTypes.GET_SCHEDULE_FAIL] : fail
 })

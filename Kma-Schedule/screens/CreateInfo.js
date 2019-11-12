@@ -5,7 +5,7 @@ import { StyleSheet, Dimensions, View, Text , Button,Alert} from 'react-native'
 import Feather from 'react-native-vector-icons/Feather'
 import XLSX from 'xlsx'
 
-
+import { insertDays, queryDays} from '../databases/allSchemas'
 
 
 import { writeFile, readFile, DocumentDirectoryPath,ExternalDirectoryPath } from 'react-native-fs';
@@ -51,72 +51,32 @@ export default CreateInfo = (props) => {
     
     
     importFile = () => {
-		readFile(DDP + "schedule.xlsx", 'ascii').then((res) => {
-            /* parse file */
-            const wb = XLSX.read(input(res), {type:'binary'});
-
-            /* convert first worksheet to AOA */
-            const wsname = wb.SheetNames[0];
-            const ws = wb.Sheets[wsname];
-            const data = XLSX.utils.sheet_to_json(ws, {header:1})
-            let collection = []
-            let schedule = []
-            data.forEach((item) => {
-                if(['2','3','4','5','6','7'].includes(item[0])) {
-                    let flagTime = item[8].split(',')[0]
-                    if(flagTime == 1) {
-                        item[8] = '07:00 AM'
-                    } else if(flagTime == 4) {
-                        item[8] = '09:30 AM'
-                    } else if(flagTime == 7) {
-                        item[8] = '12:30 PM'
-                    } else if(flagTime == 10) {
-                        item[8] = '15:00 PM'
-                    } else if(flagTime == 13) {
-                        item[8] = '18:00 PM'
-                    } else if(flagTime == 9) {
-                        item[8] = '14:15 PM'
-                    }
-                    collection.push(item)
-                }
+        let days = []
+        for(let d = new Date('2019-05-05'); d <= new Date('2020-03-03'); d.setDate(d.getDate() + 1) ) {
+            let time = new Date(d).toLocaleDateString("en-US").split('/')
+            let month = time[0].length=== 1 ? '0'+time[0] : time[0]
+            let day = time[1].length=== 1 ? '0'+time[1] : time[1]
+            let dayConvert = '20'+time[2]+'-'+month+'-'+ day
+            days.push({
+                day: dayConvert,
+                events: []
             })
-            collection.forEach((item) => {
-                let startDate = `${item[10].slice(0,10).slice(3,5)}/${item[10].slice(0,10).slice(0,2)}/${item[10].slice(0,10).slice(6,10)}`
-                let endDate = `${item[10].slice(11).slice(3,5)}/${item[10].slice(11).slice(0,2)}/${item[10].slice(11).slice(6,10)}`
-                for (let d = new Date(startDate); d <= new Date(endDate); d.setDate(d.getDate() + 1)) {
-                    if(new Date(d).getDay()+1 == item[0]) {
-                        let day = new Date(d).toLocaleDateString("en-US").split('/')
-                        let dayConvert = day[1]+'-'+day[0]+'-'+day[2]
-                        schedule.push({
-                            day: dayConvert,
-                            id: item[1],
-                            dayOfWeek: item[0],
-                            nameClass: item[4],
-                            location: item[9],
-                            teacher: item[7],
-                            time: item[8]
-                        })
-                    }
-                }
-            })
-            let objItems = schedule.reduce(function (result, item) {
-                if(!result[item.day]) {
-                    result[item.day] = [{
-                        ...item
-                    }]
-                } else {
-                    result[item.day].push({...item})
-                    console.log(result[item.day])
-                    result[item.day].sort((a, b) => {
-                        return parseInt(a.time.split(':')[0]) - parseInt(b.time.split(':')[0])
-                    })
-                    console.log(result[item.day])
-                }
-                return result
-            }, {})
-        }).catch((err) => { Alert.alert("importFile Error", "Error " + err.message); });
+        }
+        insertDays({id:1,days:days})
+        .then(()=>{
+            console.log('completed')
+        }).catch((err) => {
+            console.log(err)
+        })
+        
     }
-    
+    query = () => {
+        queryDays().then((res) => {
+            console.log(res)
+        }).catch(err => {
+            console.log(err)
+        })
+    }
 
     return (
         <View style={[styles.flex,{backgroundColor:'#F9F9FB'}]}>
@@ -143,7 +103,8 @@ export default CreateInfo = (props) => {
             <Tab heading="Tab1" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF',borderTopLeftRadius:30}} style={{borderRadius:30}}>
                 <View>
                 <Text style={styles.instructions}>Import Data</Text>
-                    <Button onPress={()=>{importFile()}} title="Import data from a spreadsheet" color="#841584" />
+                    <Button onPress={()=>{importFile()}} title="insert" color="#841584" />
+                    <Button onPress={()=>{query()}} title="query" color="#841584" />
                 </View>
             </Tab>
             <Tab heading="Tab2" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF'}} >

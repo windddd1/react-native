@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import io.realm.react.RealmReactPackage;
 import com.rnfs.RNFSPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -38,23 +39,24 @@ public class MainApplication extends Application implements ReactApplication {
         }
       };
 
-  @Override
-  public ReactNativeHost getReactNativeHost() {
-    return mReactNativeHost;
-  }
+      @Override
+      public ReactNativeHost getReactNativeHost() {
+        return mReactNativeHost;
+      }
 
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
-    initializeFlipper(this); // Remove this line if you don't want Flipper enabled
-  }
+      @Override
+      public void onCreate() {
+        super.onCreate();
+        SoLoader.init(this, /* native exopackage */ false);
+        initializeFlipper(this); // Remove this line if you don't want Flipper enabled
+      }
 
-    protected List<ReactPackage> getPackages() {
-        return Arrays.<ReactPackage>asList(
-                new MainReactPackage(), // <---- add comma
-                new RNFSPackage() // <---------- add package
-        );}
+    protected List getPackages() {
+        return Arrays.asList(
+                new MainReactPackage(),
+                new RealmReactPackage() // add this line
+        );
+    }
   /**
    * Loads Flipper in React Native templates.
    *

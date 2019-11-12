@@ -3,9 +3,24 @@ import { StyleSheet, View, Text, Dimensions,Alert } from 'react-native'
 import { Agenda } from 'react-native-calendars'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Mdi from 'react-native-vector-icons/MaterialCommunityIcons'
+import { connect } from 'react-redux'
+import ScheduleActions from '../redux/_schedule-redux'
+import Spinner from 'react-native-loading-spinner-overlay'
 
 const { width, height } = Dimensions.get('screen')
 
+const mapDispatchToProps = dispatch => ({
+    getClasses: () => dispatch(ScheduleActions.getScheduleRequest()),
+    
+})
+
+const mapStateToProps = state => {
+    return {
+        processing: state.schedule.processing,
+        classes: state.schedule.data.classes,
+        error: state.schedule.error
+    }
+}
 
 const styles = StyleSheet.create({
     flex: {
@@ -52,10 +67,13 @@ const styles = StyleSheet.create({
         fontWeight:'700',
         fontSize:16,
         color:'#606070'
-    }
+    },
+    spinnerTextStyle: {
+        color: '#FFF'
+    },
 })
 
-export default Canlendar = (props) => {
+const Canlendar = (props) => {
     const styleCalendar = {
         backgroundColor: '#ffffff',
         agendaKnobColor: '#343F85',
@@ -67,13 +85,17 @@ export default Canlendar = (props) => {
         agendaTodayColor: '#272F5E'
     }
 
-    const [classes,setClasses] = useState()
     useEffect(()=>{
-        
+        // props.getClasses()
     },[])
     renderClass = (item) => {
         return (
         <View style={[styles.containerClasses,styles.shadow,styles.row]}>
+            <Spinner
+                visible={props.processing}
+                textContent={'Loading...'}
+                textStyle={styles.spinnerTextStyle}
+            />
             <View style={[{flex:0.2},styles.center]}>
                 <Text style={{fontSize:18, color:'#3D3C51',fontWeight:'bold'}}>{item.start.slice(0,5)}</Text>
                 <Text style={{fontSize:14, color:'#97969E',fontWeight:'600'}}>{item.start.slice(5)}</Text>
@@ -91,8 +113,7 @@ export default Canlendar = (props) => {
 
     return (
         <Agenda
-            items={classes}
-            refreshing={false} 
+            items={props.classes}
             renderEmptyData={() => { return (<Text>No Data</Text>) }}
             rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
             renderItem={(item, firstItemInDay) => renderClass(item)}
@@ -110,3 +131,4 @@ export default Canlendar = (props) => {
         />
     )
 }
+export default connect(mapStateToProps, mapDispatchToProps)(Canlendar)

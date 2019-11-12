@@ -1,6 +1,7 @@
 import { put, call } from 'redux-saga/effects'
 import ScheduleActions from '../redux/_schedule-redux'
 import XLSX from 'xlsx'
+import { insertDays, queryDays,insertEvent } from '../databases/allSchemas'
 
 
 import { readFile,ExternalDirectoryPath } from 'react-native-fs';
@@ -9,7 +10,26 @@ const input = res => res;
 
 
 const ScheduleSagas = {
-    *getSchedule() {
+    *postSchedule() {
+        let days = []
+        for(let d = new Date('2019-05-05'); d <= new Date('2020-03-03'); d.setDate(d.getDate() + 1) ) {
+            let time = new Date(d).toLocaleDateString("en-US").split('/')
+            let month = time[0].length=== 1 ? '0'+time[0] : time[0]
+            let day = time[1].length=== 1 ? '0'+time[1] : time[1]
+            let dayConvert = '20'+time[2]+'-'+month+'-'+ day
+            days.push({
+                day: dayConvert,
+                events: []
+            })
+        }
+        insertDays({id:1,days:days})
+        .then(()=>{
+            console.log('completed')
+        }).catch((err) => {
+            console.log(err)
+        })
+    },
+    *getDataFromExcel() {
         try {
             const res = yield call(importFile)
             const wb = XLSX.read(input(res), {type:'binary'});
@@ -56,6 +76,16 @@ const ScheduleSagas = {
                             teacher: item[7],
                             start: item[8]
                         })
+                        insertEvent(dayConvert,{
+                            day: dayConvert,
+                            id: new Date().getTime().toString(),
+                            dayOfWeek: item[0],
+                            name: item[4],
+                            location: item[9],
+                            teacher: item[7],
+                            start: item[8]
+                        })
+                        .then(()=>{console.log('done')})
                     }
                 }
             })
@@ -72,17 +102,17 @@ const ScheduleSagas = {
                 }
                 return result
             }, {})
-            yield put(ScheduleActions.getUserSuccess(objItems))
+            yield put(ScheduleActions.getScheduleSuccess(objItems))
         } catch (err) {
             console.log(err)
-            yield put(ScheduleActions.getUserFail(err))
+            yield put(ScheduleActions.getScheduleFail(err))
         }
     },
     
 }
 
 function importFile() {
-    readFile(DDP + "schedule.xls", 'ascii')
+    return readFile(DDP + "schedule.xls", 'ascii')
 }
 
 
