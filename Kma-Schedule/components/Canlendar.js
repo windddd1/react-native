@@ -1,28 +1,14 @@
-import React, { useState, useEffect, useMemo, Component } from 'react';
-import { StyleSheet, View, Text, Dimensions,Alert } from 'react-native'
+import React, { useState, useEffect, useMemo } from 'react';
+import { StyleSheet, View, Text, Dimensions } from 'react-native'
 import { Agenda } from 'react-native-calendars'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Mdi from 'react-native-vector-icons/MaterialCommunityIcons'
-import { connect } from 'react-redux'
 import ScheduleActions from '../redux/_schedule-redux'
 import Spinner from 'react-native-loading-spinner-overlay'
-import { insertDays, queryDays,insertDay } from '../databases/allSchemas'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { createSelector } from 'reselect'
 const { width, height } = Dimensions.get('screen')
-
-const mapDispatchToProps = dispatch => ({
-    getClasses: () => dispatch(ScheduleActions.getScheduleRequest()),
-    
-})
-
-const mapStateToProps = state => {
-    return {
-        processing: state.schedule.processing,
-        classes: state.schedule.data.classes,
-        error: state.schedule.error
-    }
-}
-
+import abc from '../redux/root-reducer'
 const styles = StyleSheet.create({
     flex: {
         flex: 1
@@ -72,9 +58,19 @@ const styles = StyleSheet.create({
     spinnerTextStyle: {
         color: '#FFF'
     },
+    hour: {
+        fontSize:18,
+        color:'#3D3C51',
+        fontWeight:'bold'
+    },
+    amPm: {
+        fontSize:18, 
+        color:'#3D3C51',
+        fontWeight:'bold'
+    }
 })
 
-const Canlendar = (props) => {
+export default Canlendar = (props) => {
     const styleCalendar = {
         backgroundColor: '#ffffff',
         agendaKnobColor: '#343F85',
@@ -85,34 +81,16 @@ const Canlendar = (props) => {
         dayTextColor: '#606070',
         agendaTodayColor: '#272F5E'
     }
-    const [ classes, setClasses ] = useState()
+    const dispatch = useDispatch()
+    const processing = useSelector(state => state.schedule.processing)
+    const classes = useSelector(state => state.schedule.data.classes)
+    const getClasses = () => {
+        dispatch(ScheduleActions.getScheduleRequest())
+    }
     useEffect(()=>{
-        // props.getClasses()
-        queryDays().then((res) => {
-            let objItems = res.reduce(function (result, item) {
-                if(!result[item.day]) {
-                    if(item.events.length > 1){
-                        let sortEvents = []
-                        for(let obj in item.events){
-                            sortEvents.push(item.events[obj])
-                        }
-                        sortEvents.sort((a, b) => {
-                            return parseInt(a.start.split(':')[0]) - parseInt(b.start.split(':')[0])
-                        })
-                        result[item.day] = sortEvents
-                    } else {
-                        result[item.day] = item.events
-                    }
-                }
-                
-                return result
-            }, {})
-            
-            setClasses(objItems)
-        }).catch(err => {
-            console.log(err)
-        })
+        getClasses()
     },[])
+
     renderClass = (item) => {
         return (
         <View style={[styles.containerClasses,styles.shadow,styles.row]}>
@@ -122,8 +100,8 @@ const Canlendar = (props) => {
                 textStyle={styles.spinnerTextStyle}
             />
             <View style={[{flex:0.2},styles.center]}>
-                <Text style={{fontSize:18, color:'#3D3C51',fontWeight:'bold'}}>{item.start.slice(0,5)}</Text>
-                <Text style={{fontSize:14, color:'#97969E',fontWeight:'600'}}>{item.start.slice(5)}</Text>
+                <Text style={styles.hour}>{item.start.slice(0,5)}</Text>
+                <Text style={styles.amPm}>{item.start.slice(5)}</Text>
             </View>
             <View style={[styles.detailClasses]}>
                 <Text style={styles.nameTeacher}>{item.name}</Text>
@@ -156,4 +134,3 @@ const Canlendar = (props) => {
         />
     )
 }
-export default connect(mapStateToProps, mapDispatchToProps)(Canlendar)

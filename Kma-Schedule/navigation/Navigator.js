@@ -13,7 +13,6 @@ export default createBottomTabNavigator(
         Schedule,
         Task,
         CreateInfo,
-
     },
     {
         tabBarComponent: props => (

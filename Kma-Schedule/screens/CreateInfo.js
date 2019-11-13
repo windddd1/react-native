@@ -3,17 +3,10 @@ import React,{ useState, useEffect, useMemo, Component } from 'react'
 import {  Tab, Tabs, ScrollableTab ,Item, Picker} from 'native-base'
 import { StyleSheet, Dimensions, View, Text , Button,Alert} from 'react-native'
 import Feather from 'react-native-vector-icons/Feather'
-import XLSX from 'xlsx'
-
-import { insertDays, queryDays,insertDay } from '../databases/allSchemas'
-
-
-import { writeFile, readFile, DocumentDirectoryPath,ExternalDirectoryPath } from 'react-native-fs';
-const DDP = ExternalDirectoryPath + "/";
-const input = res => res;
-const output = str => str;
-
-
+import Spinner from 'react-native-loading-spinner-overlay'
+import { useDispatch, useSelector } from 'react-redux'
+import ScheduleActions from '../redux/_schedule-redux'
+import { insertDays, queryDays,insertDay,deleteEvent } from '../databases/allSchemas'
 const { width, height } = Dimensions.get('screen')
 
 const styles = StyleSheet.create({
@@ -47,51 +40,24 @@ const styles = StyleSheet.create({
 })
 
 export default CreateInfo = (props) => {
-    const [file, setFile] = useState()
-    
-    
-    importFile = () => {
-        let days = []
-        for(let d = new Date('2019-05-05'); d <= new Date('2020-03-03'); d.setDate(d.getDate() + 1) ) {
-            let time = new Date(d).toLocaleDateString("en-US").split('/')
-            let month = time[0].length=== 1 ? '0'+time[0] : time[0]
-            let day = time[1].length=== 1 ? '0'+time[1] : time[1]
-            let dayConvert = '20'+time[2]+'-'+month+'-'+ day
-            insertDay(1,{
-                day: dayConvert,
-                events: []
-            })
-            .then(()=>{
-                console.log('completed')
-            }).catch((err) => {
-                console.log(err)
-            })
-        }
+    const dispatch = useDispatch()
+    const processing = useSelector(state => state.schedule.processing)
+    const importFile = () => {
+        dispatch(ScheduleActions.getDataFromExcelRequest())
     }
-    query = () => {
-        queryDays().then((res) => {
-            // res.forEach((item) => {
-            //     console.log(item.events)
-            // })
-            console.log(res)
-            let objItems = res.reduce(function (result, item) {
-                if(!result[item.day]) {
-                    
-                } else {
-                    result[item.day].push({...item})
-                    result[item.day].sort((a, b) => {
-                        return parseInt(a.start.split(':')[0]) - parseInt(b.start.split(':')[0])
-                    })
-                }
-                return result
-            }, {})
+    deleteData = () => {
+        deleteEvent().then(() => {
         }).catch(err => {
             console.log(err)
         })
     }
-
     return (
         <View style={[styles.flex,{backgroundColor:'#F9F9FB'}]}>
+        <Spinner
+            visible={processing}
+            textContent={'Loading...'}
+            textStyle={styles.spinnerTextStyle}
+        />
         <View style={{flex:0.2, backgroundColor:'#D4E7FE'}}>
             <View style={[{marginLeft:20,marginTop:height*0.02,}]}>
                 <Text style={{fontSize:24,fontWeight:'bold',color:'#272F5E'}}><Feather name='calendar' size={30} color='#8288A6'/>  Create Schedule</Text>
@@ -115,8 +81,8 @@ export default CreateInfo = (props) => {
             <Tab heading="Tab1" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF',borderTopLeftRadius:30}} style={{borderRadius:30}}>
                 <View>
                 <Text style={styles.instructions}>Import Data</Text>
-                    <Button onPress={()=>{importFile()}} title="insert" color="#841584" />
-                    <Button onPress={()=>{query()}} title="query" color="#841584" />
+                    <Button onPress={()=>{importFile()}} title="Add schedule" color="#841584" />
+                    <Button onPress={()=>{deleteData()}} title="delete" color="#841584" />
                 </View>
             </Tab>
             <Tab heading="Tab2" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF'}} >

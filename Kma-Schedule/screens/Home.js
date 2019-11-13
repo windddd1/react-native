@@ -1,9 +1,13 @@
 import React,{ useState, useEffect, useMemo, Component } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
 import { StyleSheet,StatusBar, View, Text, Dimensions, TouchableOpacity, Image  } from 'react-native'
+import Spinner from 'react-native-loading-spinner-overlay'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Mdi from 'react-native-vector-icons/MaterialCommunityIcons'
-const { width, height } = Dimensions.get('screen')
+import ScheduleActions from '../redux/_schedule-redux'
 
+
+const { width, height } = Dimensions.get('screen')
 
 const styles = StyleSheet.create({
     flex: {
@@ -70,6 +74,14 @@ const styles = StyleSheet.create({
         fontSize:18,
         marginLeft:5,
         color:'#BFBEC5'
+    },
+    task: {
+        backgroundColor:'#FEF5F6',
+        height:height*0.18,
+        width:height*0.18,
+        marginTop:15,
+        borderRadius:20,
+        padding:15
     }
 })
 
@@ -93,10 +105,22 @@ const classes = [
 ] 
 
 export default Home = (props) => {
-   // 
+    const dispatch = useDispatch()
+    const processing = useSelector(state => state.schedule.processing)
+    const createScheduleRequest = () => {
+        dispatch(ScheduleActions.createScheduleRequest())
+    }
+    useEffect(()=>{
+        createScheduleRequest()
+    },[])
     return (
         <View style={[styles.flex,{backgroundColor:'#F9F9FB'}]}>
             <StatusBar backgroundColor="#D4E7FE" barStyle="dark-content"/>
+            <Spinner
+                visible={processing}
+                textContent={'Loading...'}
+                textStyle={styles.spinnerTextStyle}
+            />
             <View style={{flex:0.3, backgroundColor:'#D4E7FE'}}>
                 <Text style={[styles.time]}>Wed 10 Oct</Text>
                 <View style={[styles.row]}>
@@ -147,7 +171,7 @@ export default Home = (props) => {
                         <Text style={[styles.contentTitleSchedule]}>Your Task</Text>
                         <TouchableOpacity><Text style={[styles.moreBtn]}>More</Text></TouchableOpacity>
                     </View>
-                    <View style={{backgroundColor:'#FEF5F6',height:height*0.18,width:height*0.18,marginTop:15,borderRadius:20,padding:15}}>
+                    <View style={styles.task}>
                         <Text>sdfsdf</Text>
                         <Text>sdfsdf</Text>
                     </View>

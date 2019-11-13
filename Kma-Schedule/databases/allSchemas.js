@@ -42,13 +42,18 @@ const databaseOption = {
 }
 
 //function for days
-export const insertDays = (days) => new Promise((resolve, reject) =>{
+export const createSchedule = (schedule) => new Promise((resolve, reject) =>{
     Realm.open(databaseOption)
     .then(realm => {
-        realm.write(() => {
-            realm.create(SCHEDULE_SCHEMA,days)
+        let listSchedule = realm.objects(SCHEDULE_SCHEMA)
+        if(listSchedule.length === 0) {
+            realm.write(() => {
+                realm.create(SCHEDULE_SCHEMA,schedule)
+                resolve()
+            })
+        } else {
             resolve()
-        })
+        }
     }).catch((e) => {
         console.log(e)
         reject(e)
@@ -85,14 +90,25 @@ export const insertEvent = (idDay, newEvent) => new Promise((resolve, reject) =>
     Realm.open(databaseOption)
     .then(realm => {
         let day = realm.objectForPrimaryKey(DAY_SCHEMA,idDay)
-        console.log(day)
-        //  realm.write(() => {
-        //   day.events.push(newEvent)           
-        // })
-
+        realm.write(() => {
+            day.events.push(newEvent)         
+        })
     }).catch((err) => {
         console.log(err)
         reject(err)
+    })
+})
+
+export const deleteEvent = () => new Promise((resolve, reject) => {
+    Realm.open(databaseOption)
+    .then(realm => {
+        let days = realm.objects(EVENT_SCHEMA)
+        realm.write(() => {
+            realm.delete(days)       
+        })
+    }).catch((e) => {
+        console.log(e)
+        reject(e)
     })
 })
 
