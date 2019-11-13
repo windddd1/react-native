@@ -70,7 +70,21 @@ export default CreateInfo = (props) => {
     }
     query = () => {
         queryDays().then((res) => {
-            console.log(res.length)
+            // res.forEach((item) => {
+            //     console.log(item.events)
+            // })
+            console.log(res)
+            let objItems = res.reduce(function (result, item) {
+                if(!result[item.day]) {
+                    
+                } else {
+                    result[item.day].push({...item})
+                    result[item.day].sort((a, b) => {
+                        return parseInt(a.start.split(':')[0]) - parseInt(b.start.split(':')[0])
+                    })
+                }
+                return result
+            }, {})
         }).catch(err => {
             console.log(err)
         })

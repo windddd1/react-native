@@ -1,7 +1,7 @@
 import { put, call } from 'redux-saga/effects'
 import ScheduleActions from '../redux/_schedule-redux'
 import XLSX from 'xlsx'
-import { insertDays, queryDays,insertEvent } from '../databases/allSchemas'
+import { insertDays, queryDays, insertEvent } from '../databases/allSchemas'
 
 
 import { readFile,ExternalDirectoryPath } from 'react-native-fs';
@@ -10,24 +10,40 @@ const input = res => res;
 
 
 const ScheduleSagas = {
-    *postSchedule() {
-        let days = []
-        for(let d = new Date('2019-05-05'); d <= new Date('2020-03-03'); d.setDate(d.getDate() + 1) ) {
-            let time = new Date(d).toLocaleDateString("en-US").split('/')
-            let month = time[0].length=== 1 ? '0'+time[0] : time[0]
-            let day = time[1].length=== 1 ? '0'+time[1] : time[1]
-            let dayConvert = '20'+time[2]+'-'+month+'-'+ day
-            days.push({
-                day: dayConvert,
-                events: []
-            })
-        }
-        insertDays({id:1,days:days})
-        .then(()=>{
-            console.log('completed')
-        }).catch((err) => {
+    *getSchedule() {
+        queryDays().then((res) => {
+            let objItems = res.reduce(function (result, item) {
+                if(!result[item.day]) {
+                    if(item.events.length > 1){
+                        let sortEvents = []
+                        for(let obj in item.events){
+                            sortEvents.push(item.events[obj])
+                        }
+                        sortEvents.sort((a, b) => {
+                            return parseInt(a.start.split(':')[0]) - parseInt(b.start.split(':')[0])
+                        })
+                        result[item.day] = sortEvents
+                    } else {
+                        result[item.day] = item.events
+                    }
+                }
+                
+                return result
+            }, {})
+            
+            setClasses(objItems)
+        }).catch(err => {
             console.log(err)
         })
+    },
+    *createSchedule() {
+        try {
+            const days = yield call(createDaysEmpty)
+            yield put(ScheduleActions.createScheduleSuccess())
+        } catch(err) {
+            console.log(err)
+            yield put(ScheduleActions.createScheduleFail(err))
+        }
     },
     *getDataFromExcel() {
         try {
@@ -113,6 +129,21 @@ const ScheduleSagas = {
 
 function importFile() {
     return readFile(DDP + "schedule.xls", 'ascii')
+}
+
+function createDaysEmpty() {
+    let days = []
+        for(let d = new Date('2019-05-05'); d <= new Date('2020-03-03'); d.setDate(d.getDate() + 1) ) {
+            let time = new Date(d).toLocaleDateString("en-US").split('/')
+            let month = time[0].length=== 1 ? '0'+time[0] : time[0]
+            let day = time[1].length=== 1 ? '0'+time[1] : time[1]
+            let dayConvert = '20'+time[2]+'-'+month+'-'+ day
+            days.push({
+                day: dayConvert,
+                events: []
+            })
+        }
+    return insertDays({id:1,days:days})
 }
 
 

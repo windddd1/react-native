@@ -6,6 +6,7 @@ import Mdi from 'react-native-vector-icons/MaterialCommunityIcons'
 import { connect } from 'react-redux'
 import ScheduleActions from '../redux/_schedule-redux'
 import Spinner from 'react-native-loading-spinner-overlay'
+import { insertDays, queryDays,insertDay } from '../databases/allSchemas'
 
 const { width, height } = Dimensions.get('screen')
 
@@ -84,220 +85,33 @@ const Canlendar = (props) => {
         dayTextColor: '#606070',
         agendaTodayColor: '#272F5E'
     }
-    const classes = {
-        '2019-11-04': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        }],
-        '2019-11-05': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        }],
-        '2019-11-06': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        }]
-        ,
-        '2019-11-07': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        },
-        {
-            id: '2',
-            start: '09:30 AM',
-            end: '11:30 AM',
-            name: 'Programing C++',
-            location: 'Room 304',
-            teacher: 'Nguyen Anh Tien'
-        },]
-        ,
-        '2019-11-08': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        },
-        {
-            id: '2',
-            start: '09:30 AM',
-            end: '11:30 AM',
-            name: 'Programing C++',
-            location: 'Room 304',
-            teacher: 'Nguyen Anh Tien'
-        },]
-        ,
-        '2019-11-09': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        },
-        {
-            id: '2',
-            start: '09:30 AM',
-            end: '11:30 AM',
-            name: 'Programing C++',
-            location: 'Room 304',
-            teacher: 'Nguyen Anh Tien'
-        },]
-        ,
-        '2019-11-10': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        },
-        {
-            id: '2',
-            start: '09:30 AM',
-            end: '11:30 AM',
-            name: 'Programing C++',
-            location: 'Room 304',
-            teacher: 'Nguyen Anh Tien'
-        },]
-        ,
-        '2019-11-11': [],
-        '2019-11-12': [],
-        '2019-11-13': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        },
-        {
-            id: '2',
-            start: '09:30 AM',
-            end: '11:30 AM',
-            name: 'Programing C++',
-            location: 'Room 304',
-            teacher: 'Nguyen Anh Tien'
-        },],
-        '2019-11-13': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        },
-        {
-            id: '2',
-            start: '09:30 AM',
-            end: '11:30 AM',
-            name: 'Programing C++',
-            location: 'Room 304',
-            teacher: 'Nguyen Anh Tien'
-        },],
-        '2019-11-14': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        },
-        {
-            id: '2',
-            start: '09:30 AM',
-            end: '11:30 AM',
-            name: 'Programing C++',
-            location: 'Room 304',
-            teacher: 'Nguyen Anh Tien'
-        },],
-        '2019-11-15': [],
-        '2019-11-16': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        },
-        {
-            id: '2',
-            start: '09:30 AM',
-            end: '11:30 AM',
-            name: 'Programing C++',
-            location: 'Room 304',
-            teacher: 'Nguyen Anh Tien'
-        },],
-        '2019-11-17': [],
-        '2019-11-18': [],
-        '2019-11-19': [],
-        '2019-11-20': [],
-        '2019-11-21': [],
-        '2019-11-22': [],
-        '2019-11-23': [],
-        '2019-11-24': [],
-        '2019-11-25': [],
-        '2019-11-26': [],
-        '2019-11-27': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        }],
-        '2019-11-28': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        }],
-        '2019-11-29': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        }],
-        '2019-11-30': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        }],
-        '2019-12-01': [{
-            id: '1',
-            start: '07:00 AM',
-            end: '09:30 AM',
-            name: 'The Basic of Typography',
-            location: 'Room 204',
-            teacher: 'Do Tuan Anh'
-        }],
-    }
+    const [ classes, setClasses ] = useState()
     useEffect(()=>{
         // props.getClasses()
+        queryDays().then((res) => {
+            let objItems = res.reduce(function (result, item) {
+                if(!result[item.day]) {
+                    if(item.events.length > 1){
+                        let sortEvents = []
+                        for(let obj in item.events){
+                            sortEvents.push(item.events[obj])
+                        }
+                        sortEvents.sort((a, b) => {
+                            return parseInt(a.start.split(':')[0]) - parseInt(b.start.split(':')[0])
+                        })
+                        result[item.day] = sortEvents
+                    } else {
+                        result[item.day] = item.events
+                    }
+                }
+                
+                return result
+            }, {})
+            
+            setClasses(objItems)
+        }).catch(err => {
+            console.log(err)
+        })
     },[])
     renderClass = (item) => {
         return (
