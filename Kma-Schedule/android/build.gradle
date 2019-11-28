@@ -6,7 +6,12 @@ buildscript {
         minSdkVersion = 16
         compileSdkVersion = 28
         targetSdkVersion = 28
+        googlePlayServicesVersion = "16.+"
+        firebaseVersion = "+" // default: "+"
+        
     }
+
+
     repositories {
         google()
         jcenter()

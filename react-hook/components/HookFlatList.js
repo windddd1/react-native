@@ -24,7 +24,7 @@ const mapStateToProps = state => {
 
 const BasicFlatList = React.memo(props => {
     const [userCollection, setUserCollection] = useState([])
-    const [deleteKey, setDeleteKey] = useState(undefined)
+    const [deleteKey, setDeleteKey] = useState()
 
     useEffect(() => {
         props.getListUser()

@@ -2,6 +2,16 @@ import Realm from 'realm'
 export const SCHEDULE_SCHEMA = 'schedule'
 export const DAY_SCHEMA = 'day'
 export const EVENT_SCHEMA = 'event'
+export const USER_SCHEMA = 'user'
+
+export const UserSchema = {
+    name: USER_SCHEMA,
+    primaryKey:'id',
+    properties: {
+        id:'string',
+        name:'string'
+    }
+}
 
 export const ScheduleSchema = {
     name : SCHEDULE_SCHEMA,
@@ -41,6 +51,35 @@ const databaseOption = {
     schemaVersion: 0
 }
 
+export const createUser = (user) => new Promise((resolve,reject) => {
+    Realm.open(databaseOption)
+    .then(realm => {
+        let user = realm.objects(USER_SCHEMA)
+            realm.write(() => {
+                realm.create(USER_SCHEMA,user)
+                resolve()
+            }).catch((e) => {
+                console.log(e)
+                reject(e)
+            })
+    })
+})
+
+
+export const queryUser = () => new Promise((resolve, reject) => {
+    Realm.open(databaseOption)
+    .then(realm => {
+        let user = realm.objects(USER_SCHEMA)
+        if(listSchedule.length === 0) {
+            resolve(false)
+        } else {
+            resolve(user[0])
+        }
+    }).catch((e) => {
+        console.log(e)
+        reject(e)
+    })
+})
 //function for days
 export const createSchedule = (schedule) => new Promise((resolve, reject) =>{
     Realm.open(databaseOption)
@@ -49,10 +88,10 @@ export const createSchedule = (schedule) => new Promise((resolve, reject) =>{
         if(listSchedule.length === 0) {
             realm.write(() => {
                 realm.create(SCHEDULE_SCHEMA,schedule)
-                resolve()
+                resolve(true)
             })
         } else {
-            resolve()
+            resolve(false)
         }
     }).catch((e) => {
         console.log(e)
@@ -85,8 +124,32 @@ export const queryDays = () => new Promise((resolve, reject) => {
     })
 })
 
+export const queryByDay = (dayId) => new Promise((resolve, reject) => {
+    Realm.open(databaseOption)
+    .then(realm => {
+        let listSchedule = realm.objects(SCHEDULE_SCHEMA)
+        if(listSchedule.length === 0) {
+            resolve([])
+        } else {
+            let events = []
+            let days = realm.objects(DAY_SCHEMA)
+            let now = days.filtered(`day = "${dayId}"`)
+            if(now[0].events.length !== 0) {
+                now[0].events.forEach((item) => events.push(item))
+                resolve(events.sort((a, b) => {
+                    return parseInt(a.start.split(':')[0]) - parseInt(b.start.split(':')[0])
+                }))
+            } else {
+                resolve({})
+            }
+        }
+    }).catch((e) => {
+        console.log(e)
+        reject(e)
+    })
+})
+
 export const insertEvent = (idDay, newEvent) => new Promise((resolve, reject) => {
-    
     Realm.open(databaseOption)
     .then(realm => {
         let day = realm.objectForPrimaryKey(DAY_SCHEMA,idDay)
@@ -106,6 +169,7 @@ export const deleteEvent = () => new Promise((resolve, reject) => {
         realm.write(() => {
             realm.delete(days)       
         })
+        resolve()
     }).catch((e) => {
         console.log(e)
         reject(e)

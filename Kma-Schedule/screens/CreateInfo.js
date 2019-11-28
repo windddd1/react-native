@@ -1,17 +1,18 @@
 
-import React,{ useState, useEffect, useMemo, Component } from 'react'
-import {  Tab, Tabs, ScrollableTab ,Item, Picker} from 'native-base'
-import { StyleSheet, Dimensions, View, Text , Button,Alert} from 'react-native'
+import React,{ useCallback } from 'react'
+import { StyleSheet, Dimensions, View, Text , Button,Alert,TouchableOpacity,TextInput } from 'react-native'
 import Feather from 'react-native-vector-icons/Feather'
 import Spinner from 'react-native-loading-spinner-overlay'
 import { useDispatch, useSelector } from 'react-redux'
 import ScheduleActions from '../redux/_schedule-redux'
-import { insertDays, queryDays,insertDay,deleteEvent } from '../databases/allSchemas'
+import { deleteEvent,queryByDay,queryDays } from '../databases/allSchemas'
+import NotifService from '../notification/notiService'
 const { width, height } = Dimensions.get('screen')
 
 const styles = StyleSheet.create({
     flex: {
-        flex:1
+        flex:1,
+        backgroundColor:'#F9F9FB'
     },
     column: {
         flexDirection: 'column'
@@ -37,67 +38,95 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         elevation: 3,
     },
+    alignItems: {
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    button: {
+        height:50,
+        width:150,
+        backgroundColor:'#272F5E',
+        borderRadius:12
+    },
+    contentButton: {
+        color:'#FFFFFF',
+        fontSize:20
+    },
+    containerHeader: {
+        flex:0.2, 
+        backgroundColor:'#D4E7FE'
+    },
+    titleHeader: {
+        fontSize:24,
+        fontWeight:'bold',
+        color:'#272F5E'
+    },
+    alignTitleHeader: {
+        marginLeft:20,
+        marginTop:height*0.02
+    }
 })
 
 export default CreateInfo = (props) => {
     const dispatch = useDispatch()
     const processing = useSelector(state => state.schedule.processing)
-    const importFile = () => {
-        dispatch(ScheduleActions.getDataFromExcelRequest())
-    }
-    deleteData = () => {
+    const events = useSelector(state => state.schedule.data.eventByNow)
+    const importFile = useCallback(
+        () =>  dispatch(ScheduleActions.getDataFromExcelRequest()),
+        [dispatch]
+    )
+    const getClasses = useCallback(
+        () =>  dispatch(ScheduleActions.getScheduleRequest()),
+        [dispatch]
+    )
+
+    const deleteData = () => {
         deleteEvent().then(() => {
+            const notif = new NotifService()
+            notif.cancelAll()
         }).catch(err => {
             console.log(err)
         })
     }
+    const noti = () => {
+        const notif = new NotifService()
+        let dayConvert = '2019'+'-'+'10'+'-'+ '18'
+        notif.scheduleNotif({
+            time: dayConvert+' '+'09:52',
+            id:'abcc',
+            name: 'phong123',
+            location: 'phong123',
+            start: '09:40 PM'
+        })
+    }
     return (
-        <View style={[styles.flex,{backgroundColor:'#F9F9FB'}]}>
+        <View style={[styles.flex]}>
         <Spinner
             visible={processing}
             textContent={'Loading...'}
             textStyle={styles.spinnerTextStyle}
         />
-        <View style={{flex:0.2, backgroundColor:'#D4E7FE'}}>
-            <View style={[{marginLeft:20,marginTop:height*0.02,}]}>
-                <Text style={{fontSize:24,fontWeight:'bold',color:'#272F5E'}}><Feather name='calendar' size={30} color='#8288A6'/>  Create Schedule</Text>
-                <Item picker style={{ width: 100 ,borderColor:'transparent',marginLeft:35}}>
-                    <Picker
-                        mode="dropdown"
-                        style={{ fontSize:24,fontWeight:'bold',color:'#272F5E' }}
-                        placeholderIconColor="#007aff"
-                    >
-                        <Picker.Item label="AT13" value="key0" />
-                        <Picker.Item label="CT1" value="key1" />
-                        <Picker.Item label="AT14" value="key2" />
-                        <Picker.Item label="AT15" value="key3" />
-                        <Picker.Item label="AT16" value="key4" />
-                    </Picker>
-                </Item>
+        <View style={styles.containerHeader}>
+            <View style={[styles.alignTitleHeader]}>
+                <Text style={styles.titleHeader}><Feather name='settings' size={30} color='#8288A6'/>  Setting</Text>
             </View>
         </View>
-        <View style={[styles.shadow,styles.containerCalendar,styles.shadow]}>
-        <Tabs style={{marginHorizontal:36}} tabBarUnderlineStyle={{backgroundColor:'#D4E7FE'}} renderTabBar={()=> <ScrollableTab style={{backgroundColor:'#FFFFFF'}}/>}>
-            <Tab heading="Tab1" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF',borderTopLeftRadius:30}} style={{borderRadius:30}}>
-                <View>
-                <Text style={styles.instructions}>Import Data</Text>
-                    <Button onPress={()=>{importFile()}} title="Add schedule" color="#841584" />
-                    <Button onPress={()=>{deleteData()}} title="delete" color="#841584" />
+        <View style={[styles.shadow,styles.containerCalendar,styles.shadow,styles.alignItems]}>
+            <TouchableOpacity onPress={()=>{importFile()}} activeOpacity={0.9}>
+                <View style={[styles.button,styles.alignItems]}>
+                    <Text style={styles.contentButton}>Add schedule</Text>
                 </View>
-            </Tab>
-            <Tab heading="Tab2" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} textStyle={{color:'#272F5E',fontSize:14,fontWeight:'bold'}} tabStyle={{backgroundColor:'#FFFFFF'}} >
-                <Text>abc</Text>
-            </Tab>
-            <Tab heading="Tab3" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E'}} textStyle={{color:'#272F5E'}} tabStyle={{backgroundColor:'#FFFFFF'}} style={{borderRadius:30}}>
-                <Text>abc</Text>
-            </Tab>
-            <Tab heading="Tab4" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'#272F5E'}} textStyle={{color:'#272F5E'}} tabStyle={{backgroundColor:'#FFFFFF'}} style={{borderRadius:30}}>
-                <Text>abc</Text>
-            </Tab>
-            <Tab heading="Tab5" activeTabStyle={{backgroundColor:'#FFFFFF'}} activeTextStyle={{color:'black'}} textStyle={{color:'black'}} tabStyle={{backgroundColor:'#FFFFFF'}} >
-                <Text>abc</Text>
-            </Tab>
-        </Tabs>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{deleteData()}} style={{marginTop:20}} activeOpacity={0.9}>
+                <View style={[styles.button,styles.alignItems]}>
+                    <Text style={styles.contentButton}>Delete</Text>
+                </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{noti()}} style={{marginTop:20}} activeOpacity={0.9}>
+                <View style={[styles.button,styles.alignItems]}>
+                    <Text style={styles.contentButton}>noti</Text>
+                </View>
+            </TouchableOpacity>
         </View>
     </View>
     )

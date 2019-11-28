@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import io.realm.react.RealmReactPackage;
 import com.rnfs.RNFSPackage;
 import com.facebook.react.ReactNativeHost;
@@ -54,6 +55,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List getPackages() {
         return Arrays.asList(
                 new MainReactPackage(),
+            new ReactNativePushNotificationPackage(),
                 new RealmReactPackage() // add this line
         );
     }

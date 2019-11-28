@@ -1,7 +1,8 @@
 import { put, call } from 'redux-saga/effects'
 import ScheduleActions from '../redux/_schedule-redux'
 import XLSX from 'xlsx'
-import { createSchedule, queryDays, insertEvent } from '../databases/allSchemas'
+import NotifService from '../notification/notiService'
+import { createSchedule, queryDays, insertEvent,queryByDay } from '../databases/allSchemas'
 
 
 import { readFile,ExternalDirectoryPath } from 'react-native-fs'
@@ -32,16 +33,27 @@ const ScheduleSagas = {
         try {
             const res = yield call(importFile)
             yield put(ScheduleActions.getDataFromExcelSuccess())
+            yield put(ScheduleActions.getScheduleRequest())
+            yield put(ScheduleActions.getEventByNowRequest())
         } catch (err) {
             console.log(err)
             yield put(ScheduleActions.sideEffectScheduleFail(err))
         }
     },
-    
+    *getEventByNow() {
+        try {
+            const res = yield call(queryEventByNowToRealm)
+            yield put(ScheduleActions.getEventByNowSuccess(res))
+        } catch (err) {
+            console.log(err)
+            yield put(ScheduleActions.sideEffectScheduleFail(err))
+        }
+    }
 }
 
 async function importFile() {
     try {
+        const notif = new NotifService()
         let res = await readFile(DDP + "schedule.xls", 'ascii')
         const wb = XLSX.read(input(res), {type:'binary'});
             /* convert first worksheet to AOA */
@@ -86,6 +98,16 @@ async function importFile() {
                             teacher: item[7],
                             start: item[8]
                         })
+                        let dayConvertUTC = '20'+time[2]+'-'+(parseInt(month)-1)+'-'+ day
+                        if(new Date(d).getTime() >= new Date().getTime()) {
+                            notif.scheduleNotif({
+                                time: dayConvertUTC+' '+item[8].split(' ')[0],
+                                id:new Date().getTime().toString(),
+                                name: item[4],
+                                location: item[9],
+                                start: item[8]
+                            })
+                        }
                     }
                 }
             })
@@ -128,7 +150,6 @@ function getDataToRealm() {
                         result[item.day] = item.events
                     }
                 }
-                
                 return result
             }, {})
             resolve(objItems)
@@ -138,5 +159,19 @@ function getDataToRealm() {
     })
 }
 
+function queryEventByNowToRealm() {
+    return new Promise((resolve, reject) => {
+        let date = new Date()
+        let month = parseInt(date.getMonth()+1).toString().length=== 1 ? '0'+parseInt(date.getMonth()+1).toString() : parseInt(date.getMonth()+1).toString()
+        let day = date.getDate().toString().length=== 1 ? '0'+date.getDate().toString() : date.getDate().toString()
+        let dayId = date.getFullYear()+'-'+month+'-'+day
+        queryByDay(dayId).then((res)=>{
+            resolve(res)
+        }).catch((err) => {
+            console.log(err)
+            reject(err)
+        })
+    })
+}
 
 export default ScheduleSagas

@@ -4,11 +4,10 @@ import { Agenda } from 'react-native-calendars'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Mdi from 'react-native-vector-icons/MaterialCommunityIcons'
 import ScheduleActions from '../redux/_schedule-redux'
-import Spinner from 'react-native-loading-spinner-overlay'
+import { makeSelectClasses } from '../reselect/_schedule-reselect'; 
 import { useDispatch, useSelector } from 'react-redux'
-import { createSelector } from 'reselect'
 const { width, height } = Dimensions.get('screen')
-import abc from '../redux/root-reducer'
+
 const styles = StyleSheet.create({
     flex: {
         flex: 1
@@ -43,6 +42,15 @@ const styles = StyleSheet.create({
         marginVertical:height*0.01,
         marginRight:width*0.02
     },
+    containerEmptyDay: {
+        backgroundColor:'#D4E7FE',
+        height:height*0.15,
+        borderRadius:12,
+        marginVertical:height*0.01,
+        marginRight:width*0.02,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     detailClasses: {
         flex:0.8,
         borderLeftWidth:2,
@@ -54,9 +62,6 @@ const styles = StyleSheet.create({
         fontWeight:'700',
         fontSize:16,
         color:'#606070'
-    },
-    spinnerTextStyle: {
-        color: '#FFF'
     },
     hour: {
         fontSize:18,
@@ -70,7 +75,7 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Canlendar = (props) => {
+export default Canlendar = React.memo(function MyComponent(props) {
     const styleCalendar = {
         backgroundColor: '#ffffff',
         agendaKnobColor: '#343F85',
@@ -82,23 +87,19 @@ export default Canlendar = (props) => {
         agendaTodayColor: '#272F5E'
     }
     const dispatch = useDispatch()
-    const processing = useSelector(state => state.schedule.processing)
-    const classes = useSelector(state => state.schedule.data.classes)
+    const classes = useSelector(makeSelectClasses)
     const getClasses = () => {
         dispatch(ScheduleActions.getScheduleRequest())
     }
     useEffect(()=>{
+        const focusListener = props.props.addListener('willFocus', () => {
+            getClasses()
+        })
         getClasses()
     },[])
-
-    renderClass = (item) => {
+    const renderClass = (item) => {
         return (
         <View style={[styles.containerClasses,styles.shadow,styles.row]}>
-            <Spinner
-                visible={props.processing}
-                textContent={'Loading...'}
-                textStyle={styles.spinnerTextStyle}
-            />
             <View style={[{flex:0.2},styles.center]}>
                 <Text style={styles.hour}>{item.start.slice(0,5)}</Text>
                 <Text style={styles.amPm}>{item.start.slice(5)}</Text>
@@ -112,12 +113,20 @@ export default Canlendar = (props) => {
         )
     }
 
-
+    const renderEmptyDate = () => {
+        return (
+            <View style={[styles.containerEmptyDay,styles.shadow,styles.row]}>
+                <Text style={{fontWeight:'bold',fontSize:20,color:'#272F5E'}}>
+                    This day haven't event
+                </Text>
+            </View>
+        )
+    }
 
     return (
         <Agenda
             items={classes}
-            renderEmptyDate={() => { return (<Text>No Data</Text>) }}
+            renderEmptyDate={() => renderEmptyDate()}
             rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
             renderItem={(item, firstItemInDay) => renderClass(item)}
             theme={{
@@ -133,4 +142,4 @@ export default Canlendar = (props) => {
             style={[{ borderRadius: 30 }, styles.shadow]}
         />
     )
-}
+})
